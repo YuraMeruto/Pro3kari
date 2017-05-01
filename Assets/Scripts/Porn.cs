@@ -3,13 +3,16 @@ using System.Collections;
 
 public class Porn : MonoBehaviour {
 
+    [SerializeField]
+    GameObject Master;
     private int[,] MoveData = new int[10,10];
 	// Use this for initialization
 	void Start () {
+        Master = GameObject.Find("Master");
         for (int x = 0; x < 10; x++)
         {
             for (int z =0; z < 10; z++) {
-                MoveData[x,z] = GetComponent<ReadCsv>().InputMoveData(x,z);
+                MoveData[x,z] = Master.GetComponent<ReadCsv>().InputMoveData(x,z);
             }
         }
 	}
