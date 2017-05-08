@@ -4,104 +4,156 @@ using UnityEngine;
 
 public class MoveData : MonoBehaviour
 {
-
+    [SerializeField]
+    GameObject MoveAreaObj;
     [SerializeField]
     GameObject Master;
     private int[,] ReadMoveData = new int[10, 10];//読み込まれた
 
-    private int MyPositionX;    //読み込んだデータの自分のポジション
-    private int MyPositionZ;    //読み込んだデータの自分のポジション
-                                //CSVの自分のポジションとの差分を計算
+    private int CSVMyPositionX;    //読み込んだデータの自分のポジション
+    private int CSVMyPositionZ;    //読み込んだデータの自分のポジション
+
+    private int MoveDataMaxLengthSize;
+    private int MoveDataMaxSideSize;
+    private int MaxMassSize;
+    private int MaxMassLength;
+    private int Datalength;
+    private int DataSide;
+    //CSVの自分のポジションとの差分を計算
     private int DifferenceX;    //CSVにあるデータの中心のポジションとゲームのマップのポジションの差分
     private int DifferenceZ;    //CSVにあるデータの中心のポジションとゲームのマップのポジションの差分
     private int DifferenceXCopy;    //CSVにあるデータの中心のポジションとゲームのマップのポジションの差分
     private int DifferenceZCopy;    //CSVにあるデータの中心のポジションとゲームのマップのポジションの差分
     private int MassNumber;
+    private int NowMyPosx = 0;
+    private int NowMyPosz = 0;
+    private int AbsPositionX;
+    private int AbsPositionZ;
+    private int ResultCalucationX;
+    private int ResultCalucationZ;
+    private List<int> IsPossibleAreaNumber = new List<int>();
     // Use this for initialization
     void Start()
     {
         Master = GameObject.Find("Master");
-        for (int x = 0; x < 10; x++)
+        MoveDataMaxLengthSize = Master.GetComponent<ReadCsv>().GetMaxLength();
+        MoveDataMaxSideSize = Master.GetComponent<ReadCsv>().GetMaxSide();
+        // MoveDataMaxLengthSize /= 2;
+        //        MoveDataMaxSideSize /= 2;
+        MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
+        MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
+        for (int z = 0; z <= MoveDataMaxLengthSize; z++)
         {
-            for (int z = 0; z < 10; z++)
+            for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
-                ReadMoveData[x, z] = Master.GetComponent<ReadCsv>().InputMoveData(x, z);
-                if (ReadMoveData[x, z] == 2)
+                ReadMoveData[z, x] = Master.GetComponent<ReadCsv>().InputMoveData(z, x);
+                //  Debug.Log(ReadMoveData[z, x]);
+                if (ReadMoveData[z, x] == 2)
                 {
-                    MyPositionX = x;
-                    MyPositionZ = z;
+                    CSVMyPositionX = x;//CSVのいる中心の座標X
+                    CSVMyPositionZ = z;//CSVのいる中心の座標Z
                 }
             }
         }
     }
 
-
+    /// <summary>
+    /// 自分がどこのますいるかを検索
+    /// </summary>
+    /// <param name="num"></param>
     public void IsPossibleMove(int num)
     {
         MassNumber = num;
-        int NowMyPosx = 0;
-        int NowMyPosz = 0;
-        int CopyMyPositionX = MyPositionX;
-        int CopyMyPositionZ = MyPositionZ;
+        int CopyMyPositionX = CSVMyPositionX;
+        int CopyMyPositionZ = CSVMyPositionZ;
         //自分がどこのますにいるかをけんさく
-        for (int length = 0; length <= 10; length++)
+        for (int length = 0; length < MaxMassLength; length++)
         {
-            for (int side = 0; side <= 10; side++)
+            for (int side = 0; side < MaxMassSize; side++)
             {
-                if (GetComponent<BoardMaster>().MassNum[side, length] == num)
+
+                if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
                 {
-                    NowMyPosx = side;
-                    NowMyPosz = length;
-                    break;
+                    GameObject ret;
+                    ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
+                    if (ret == null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        NowMyPosx = side;
+                        NowMyPosz = length;
+                        InstanceIsPossibleMoveArea();
+                    }
+
+                    //                    break;
                 }
             }
         }
         //自分のいるポジションからMoveDataの自分のポジションとの差分を計算
-        DifferencCalculation(NowMyPosx, NowMyPosz);
+        //        DifferencCalculation(NowMyPosx, NowMyPosz);
     }
 
 
-    public void DifferencCalculation(int nowposx, int nowposz)
-    {
-        if (MyPositionX >= nowposx)
-        {
-            DifferenceX = MyPositionX - nowposx;
-        }
-
-        else if (MyPositionX <= nowposx)
-        {
-            DifferenceX = nowposx - MyPositionX;
-        }
-
-        if (MyPositionZ >= nowposz)
-        {
-            DifferenceZ = MyPositionZ - nowposz;
-        }
-
-        else if (MyPositionZ <= nowposz)
-        {
-            DifferenceX = nowposz - MyPositionZ;
-        }
-        DifferenceXCopy = DifferenceX;
-        DifferenceZCopy = DifferenceZ;
-    }
 
     /// <summary>
     /// 移動範囲の表示及び生成
     /// </summary>
     public void InstanceIsPossibleMoveArea()
     {
-        for(int side = 0;side <=10 ; side++)
+        int KariZ = -MoveDataMaxLengthSize / 2;
+        for (int length = 0; length <= MoveDataMaxLengthSize; length++)
         {
-            for(int length = 0;length <= 10;length++)
+            int KariX = -MoveDataMaxSideSize / 2;
+            for (int side = 0; side <= MoveDataMaxSideSize; side++)
             {
-               int AbsPositionX = Mathf.Abs(MyPositionX - side);
-                int AbsPositionZ = Mathf.Abs(MyPositionZ - length);
-                if (ReadMoveData[AbsPositionX,AbsPositionZ] == 1 && Master.GetComponent<BoardMaster>().GetMassStatus(MassNumber))
+                if (ReadMoveData[length, side] == 1)
                 {
-
+                    bool IsOut = true;
+                    IsOut = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
+                    if (IsOut)
+                    {
+                        /*
+                        Debug.Log(CSVMyPositionZ);
+                        Debug.Log(CSVMyPositionX);
+                        Debug.Log(length);
+                        Debug.Log(side);
+                        */
+                        bool ret = true;
+                        int DifferencX = NowMyPosx - CSVMyPositionX;//自分のポジションとCSVのデータのポジションの差分
+                        int DifferencZ = NowMyPosz - CSVMyPositionZ;
+                        ret = Master.GetComponent<BoardMaster>().GetMassStatusNone(NowMyPosz + KariZ, NowMyPosx + KariX);
+                        if (ret)//移動できるマスであれば
+                        {
+                            Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                            //Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz, NowMyPosx].transform.position;
+                            InstancePos.y = 1.0f;
+                            Instantiate(MoveAreaObj, InstancePos, Quaternion.identity);
+                            IsPossibleAreaNumber.Add(Master.GetComponent<BoardMaster>().MassNum[NowMyPosz + KariZ, NowMyPosx + KariX]);
+                            
+                        }
+                    }
                 }
+                    KariX++;
+                
             }
+            KariZ++;
         }
+    }
+    bool OutSideTheArea(int InstanceLength,int InstanceSide)
+    {
+        bool ret = true;
+
+        if(InstanceLength > MaxMassLength || InstanceSide > MaxMassSize)
+        {
+            ret = false;
+        }
+
+        else if(InstanceLength < 0 || InstanceSide < 0)
+        {
+            ret = false;
+        }
+        return ret;
     }
 }

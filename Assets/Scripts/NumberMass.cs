@@ -2,11 +2,13 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NumberMass : MonoBehaviour {
+public class NumberMass : MonoBehaviour
+{
 
     [SerializeField]
     private int Number;
-    public enum Status {None,OK,NG}
+    private bool IsPossibleMoveArea = false;
+    public enum Status { None, OK, NG }
     public Status status = Status.None;
 
     public void SetNumber(int num)
@@ -32,5 +34,20 @@ public class NumberMass : MonoBehaviour {
     public void SetNoneStatus()
     {
         status = Status.None;
+    }
+
+    public bool GetIsPossibleMoveArea()
+    {
+        return IsPossibleMoveArea;
+    }
+
+    public void SetFalseIsPossibleMoveArea()
+    {
+        IsPossibleMoveArea = false;
+    }
+
+    public void SettrueIsPossibleMoveArea()
+    {
+        IsPossibleMoveArea = true;
     }
 }
