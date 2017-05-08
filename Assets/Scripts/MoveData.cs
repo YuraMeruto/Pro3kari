@@ -129,9 +129,9 @@ public class MoveData : MonoBehaviour
                             Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
                             //Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz, NowMyPosx].transform.position;
                             InstancePos.y = 1.0f;
-                            Instantiate(MoveAreaObj, InstancePos, Quaternion.identity);
-                            IsPossibleAreaNumber.Add(Master.GetComponent<BoardMaster>().MassNum[NowMyPosz + KariZ, NowMyPosx + KariX]);
-                            
+                          GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                            IsMoveObj.tag = "IsMovetag";
+                            Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX,true);
                         }
                     }
                 }

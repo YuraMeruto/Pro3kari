@@ -9,7 +9,7 @@ public class BoardMaster : MonoBehaviour
     public bool[,] IsMoveMassObj = new bool[10, 10];
     private GameObject[,] CharObj = new GameObject[10, 10];
     public int[,] MassNum = new int[10, 10];
-    public enum Status { None, OK, NG,IsMoveArea };
+    public enum Status { None, OK, NG, IsMoveArea };
     public Status[,] MassStatus = new Status[10, 10];
     private int PlayerNumber;
     [SerializeField]
@@ -51,8 +51,8 @@ public class BoardMaster : MonoBehaviour
                 MassObj[length, side] = Mass;
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
-              //  if (length == 2)//ポーンの初期の生成場所
-              if(length == 1 && side ==1)
+                //  if (length == 2)//ポーンの初期の生成場所
+                if (length == 1 && side == 1)
                 {
                     PlayerNumber = 1;
                     Vector3 CharacterInstancePos = InstancePos;
@@ -152,7 +152,7 @@ public class BoardMaster : MonoBehaviour
             {
                 if (MassNum[length, side] == num)
                 {
-                    return MassStatus[length, side];                                        
+                    return MassStatus[length, side];
                 }
             }
         }
@@ -207,31 +207,86 @@ public class BoardMaster : MonoBehaviour
         {
             for (int side = 0; side < MaxSide; side++)
             {
-                if(MassNum[length,side] == num)
+                if (MassNum[length, side] == num)
                 {
                     MassStatus[length, side] = Status.IsMoveArea;
                 }
             }
-        }   
+        }
     }
-    public void SetStatusIsMoveArea(int length,int side)
+    public void SetStatusIsMoveArea(int length, int side)
     {
         MassStatus[length, side] = Status.IsMoveArea;
     }
 
-    
+
     public bool GetIsMove(int num)
     {
         for (int length = 0; length < MaxLength; length++)
         {
             for (int side = 0; side < MaxSide; side++)
             {
-                if(MassNum[length,side]==num)
-                return IsMoveMassObj[length, side];
+                if (MassNum[length, side] == num)
+                    return IsMoveMassObj[length, side];
             }
         }
         return false;
     }
 
-    public
+    public bool GetIsMove(int length, int side)
+    {
+        return IsMoveMassObj[length, side];
+    }
+
+    public void SetAllFalseIsMove()
+    {
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                IsMoveMassObj[length, side] = false;
+            }
+        }
+    }
+
+    public void SetIsCharObj(int newnum, int oldnum, GameObject charobj)
+    {
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if(MassNum[length,side] == oldnum)
+                {
+                    CharObj[length, side] = null;
+                }
+                if (MassNum[length, side] == newnum)
+                {
+                    CharObj[length, side] = charobj;
+                }
+
+            }
+        }
+
+    }
+    public Vector3 GetPos(int num)
+    {
+        Vector3 vec=Vector3.zero;
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if (MassNum[length, side] == num)
+                {
+                    vec = MassObj[length, side].transform.position;
+                }
+
+            }
+        }
+        return vec;
+
+    }
+    public void SetIsMove(int length,int side,bool ret)
+    {
+        IsMoveMassObj[length, side] = ret;
+    }
 }

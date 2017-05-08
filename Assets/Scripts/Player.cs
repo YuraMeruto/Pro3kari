@@ -45,11 +45,24 @@ public class Player : MonoBehaviour
                         break;
 
                     case PlayerStatus.Choose:
-                         Status ret;
-                        ret = MasterObject.GetComponent<BoardMaster>().GetMassStatus(AtachMassNumber);
-                        if (ret == MasterObject.GetComponent<BoardMaster>().St )
+                         bool ret;
+                        CopyAtachMassObject = hit.collider.gameObject;
+                        int CopyAttaMassNumber = CopyAtachMassObject.GetComponent<NumberMass>().GetNumber();
+                        ret = MasterObject.GetComponent<BoardMaster>().GetIsMove(CopyAttaMassNumber);
+                        if (ret)
                         {
-
+                            var clones = GameObject.FindGameObjectsWithTag("IsMovetag");
+                            foreach(var clone in clones)
+                            {
+                                Destroy(clone);
+                            }
+                            Vector3 MovePos = MasterObject.GetComponent<BoardMaster>().GetPos(CopyAttaMassNumber);
+                            MovePos.y = 1.0f;
+                            AtachCharObject.transform.position = MovePos;
+                            MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttaMassNumber,AtachMassNumber,AtachCharObject);
+                            MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
+                            AtachCharObject = null;
+                            status = PlayerStatus.None;
                         }
                         break;
                 }
