@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    private enum PlayerStatus { None, Choose, OpenCard, ChoosingCard, SummonCard };
+    private enum PlayerStatus { None, Choose };
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
     private int PlayerNumber;
@@ -31,7 +31,7 @@ public class Player : MonoBehaviour
     private Vector3 MovePos;
     private enum BattleResult { Win, Lose, Draw };
     public GameObject kari;
-    private GameObject SummonObj;
+
     // Use this for initialization
     void Start()
     {
@@ -64,7 +64,7 @@ public class Player : MonoBehaviour
         */
         if (Input.GetKeyDown(KeyCode.S))
         {
-
+            
             MasterObject.GetComponent<BoardMaster>().DebugInst();
             Debug.Log("aa");
         }
@@ -95,13 +95,6 @@ public class Player : MonoBehaviour
                         CopyAtachMassObject = hit.collider.gameObject;
                         SwitchPlayerChoose();
                         break;
-
-                    case PlayerStatus.SummonCard:
-                        Debug.Log("aaaa");
-                        AtachMassObject = hit.collider.gameObject;
-                        SummonCardOnField();
-                        status = PlayerStatus.None;
-                        break;
                 }
             }
 
@@ -109,37 +102,25 @@ public class Player : MonoBehaviour
             if (Physics.Raycast(ray, out hit2, Mathf.Infinity, DeckLayer))
             {
                 Debug.Log("これはデッキです");
-                switch (status)
+                AtachDeckObj = hit2.collider.gameObject;
+                int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
+                int DeckNumber = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
+                if (MasterTurnNumber == DeckNumber)
                 {
-
-                    case PlayerStatus.None:
-                        AtachDeckObj = hit2.collider.gameObject;
-                        int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-                        int DeckNumber = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
-                        if (MasterTurnNumber == DeckNumber)
-                        {
-                            AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
-                        }
-                        status = PlayerStatus.OpenCard;
-                        break;
+                    AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
                 }
             }
 
             RaycastHit2D hit2d = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction, Mathf.Infinity, DeckCardLayer);
             if (hit2d.collider != null)
             {
-                switch (status)
-                {
-                    case PlayerStatus.OpenCard:
-                        int RaceNum;
-                        Debug.Log("これはカードです");
-                        AtachDeckCardObj = hit2d.collider.gameObject;
-                        RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
-                        MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
-                        //           SummonCardOnField();
-                        status = PlayerStatus.SummonCard;
-                        break;
-                }
+
+                int RaceNum;
+                Debug.Log("これはカードです");
+                AtachDeckCardObj = hit2d.collider.gameObject;
+                RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
+                MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
+                Debug.Log(AtachDeckCardObj);
             }
 
         }
@@ -361,25 +342,5 @@ public class Player : MonoBehaviour
         //MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber);
         return BattleResult.Draw;
     }
-    void SummonCardOnField()
-    {
-        int GetSumonNumber;
-        GetSumonNumber = AtachDeckCardObj.GetComponent<IllustrationCard>().GetSumonNumber();
-        Debug.Log(GetSumonNumber);
-        SummonObj = MasterObject.GetComponent<CharacterMaster>().GetSumonnsCharacter(GetSumonNumber);
-        Debug.Log(SummonObj);
-        Vector3 pos = AtachMassObject.transform.position;
-        pos.z += 1;
-        Instantiate(SummonObj, pos, SummonObj.transform.rotation);
-        AllIsMoveAreaDestroy();
-     //   AllSummonsCardDestroy();
-    }
-    void AllKariDestroy()
-    {
-        var clones = GameObject.FindGameObjectsWithTag("Kari");
-        foreach (var clone in clones)
-        {
-            Destroy(clone);
-        }
-    }
+
 }

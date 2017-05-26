@@ -66,7 +66,6 @@ public class BoardMaster : MonoBehaviour
                 MassObj[length, side] = Mass;
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
-                /*
                 //  if (length == 2)//ポーンの初期の生成場所
                 if (length == 1 && side == 1)//プレイヤー（仮）
                 {
@@ -116,7 +115,7 @@ public class BoardMaster : MonoBehaviour
                     CharObj[length, side] = Charcter;
                     MassStatus[length, side] = Status.None;
                 }
-                */
+
                 count++;
                 if (masscolor == 0)
                 {
