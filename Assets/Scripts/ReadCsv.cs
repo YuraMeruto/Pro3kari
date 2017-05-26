@@ -17,7 +17,7 @@ public class ReadCsv : MonoBehaviour
         int countz = 0;
         int copyx = 0;
         int copyz = 0;
-        StreamReader sr = new StreamReader(Application.dataPath + "/" + "PornMove.csv", Encoding.GetEncoding("Shift_JIS"));
+        StreamReader sr = new StreamReader(Application.dataPath + "/" + FileName +".csv", Encoding.GetEncoding("Shift_JIS"));
         while (sr.Peek() >= 0)
         {
             string[] cols = sr.ReadLine().Split(',');
