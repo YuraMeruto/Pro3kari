@@ -7,24 +7,29 @@ public class ReadCsv : MonoBehaviour
     [SerializeField]
     private string FileName;
     private int[,] IntData = new int[10, 10];
+    [SerializeField]
     private int MaxSideSize;
+    [SerializeField]
     private int MaxLengthSize;
 
     // Use this for initialization
     void Start()
     {
+        Debug.Log(FileName+".csv");
         int countx = 0;
         int countz = 0;
         int copyx = 0;
         int copyz = 0;
-        StreamReader sr = new StreamReader(Application.dataPath + "/" + "PornMove.csv", Encoding.GetEncoding("Shift_JIS"));
+        StreamReader sr = new StreamReader(Application.dataPath + "\\" + FileName +".csv", Encoding.GetEncoding("Shift_JIS"));
+        Debug.Log(Application.dataPath);
+       
         while (sr.Peek() >= 0)
         {
             string[] cols = sr.ReadLine().Split(',');
         //    Debug.Log(cols.Length);
             foreach (string col in cols)
             {
-                IntData[countz, countx] = int.Parse(col);                
+                IntData[countz, countx] = int.Parse(col);
                 countx++;
                 /*
                 if (countx > 4)
@@ -41,11 +46,11 @@ public class ReadCsv : MonoBehaviour
             countx = 0;
             countz++;
         }
-     
         MaxSideSize = copyx-1;
         MaxLengthSize = copyz;
-       // Debug.Log(MaxSideSize);
-       // Debug.Log(MaxLengthSize);
+        GetComponent<MoveData>().IniSet();
+        // Debug.Log(MaxSideSize);
+        // Debug.Log(MaxLengthSize);
 
     }
 

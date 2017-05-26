@@ -24,18 +24,24 @@ public class MoveData : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-
-        Master = GameObject.Find("Master");
-        MoveDataMaxLengthSize = Master.GetComponent<ReadCsv>().GetMaxLength();
-        MoveDataMaxSideSize = Master.GetComponent<ReadCsv>().GetMaxSide();
-
+        Master = GameObject.Find("Master");      
+    }
+    public void IniSet()
+    {
+        Debug.Log("以降中");
+        MoveDataMaxLengthSize = GetComponent<ReadCsv>().GetMaxLength();
+        MoveDataMaxSideSize = GetComponent<ReadCsv>().GetMaxSide();
+        Debug.Log(Master.name);
         MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
         MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
+        Debug.Log(MaxMassLength + "IniSet");
+        Debug.Log(MaxMassSize + "InSet");
         for (int z = 0; z <= MoveDataMaxLengthSize; z++)
         {
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
-                ReadMoveData[z, x] = Master.GetComponent<ReadCsv>().InputMoveData(z, x);
+                ReadMoveData[z, x] = GetComponent<ReadCsv>().InputMoveData(z, x);
+
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X
@@ -51,15 +57,23 @@ public class MoveData : MonoBehaviour
     /// <param name="num"></param>
     public void IsPossibleMove(int num)
     {
+       // Master = GameObject.Find("Master");
+        Debug.Log(num);
         MassNumber = num;
+        Debug.Log(Master);
+        MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
+        MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
+        Debug.Log(MaxMassSize+"IspssibleMove");
+        Debug.Log(MaxMassLength+"IspssibleMove");
         //自分がどこのますにいるかをけんさく
         for (int length = 0; length < MaxMassLength; length++)
         {
             for (int side = 0; side < MaxMassSize; side++)
             {
-
+              
                 if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
                 {
+
                     GameObject ret;
                     ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
                     if (ret == null)
@@ -85,12 +99,18 @@ public class MoveData : MonoBehaviour
     /// </summary>
     public void InstanceIsPossibleMoveArea()
     {
+        MoveDataMaxLengthSize = this.gameObject.GetComponent<ReadCsv>().GetMaxLength();
+        MoveDataMaxSideSize = this.gameObject.GetComponent<ReadCsv>().GetMaxSide();
+        Debug.Log(this.gameObject);
+        Debug.Log(this.gameObject.GetComponent<ReadCsv>().GetMaxLength());
+        Debug.Log(MoveDataMaxLengthSize);
         int KariZ = -MoveDataMaxLengthSize / 2;
         for (int length = 0; length <= MoveDataMaxLengthSize; length++)
         {
             int KariX = -MoveDataMaxSideSize / 2;
             for (int side = 0; side <= MoveDataMaxSideSize; side++)
             {
+                Debug.Log(ReadMoveData[length, side]);
                 if (ReadMoveData[length, side] == 1)
                 {
                     bool IsOut = true;
@@ -98,7 +118,6 @@ public class MoveData : MonoBehaviour
                     Debug.Log(IsOut);
                     if (IsOut)
                     {
-
                         bool ret = true;
                         ret = Master.GetComponent<BoardMaster>().GetMassStatusNone(NowMyPosz + KariZ, NowMyPosx + KariX);
                         Debug.Log(ret);
@@ -143,7 +162,6 @@ public class MoveData : MonoBehaviour
         }
         return ret;
     }
-
 
 
 }

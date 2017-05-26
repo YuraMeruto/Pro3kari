@@ -67,6 +67,7 @@ public class BoardMaster : MonoBehaviour
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
                 //  if (length == 2)//ポーンの初期の生成場所
+                /*
                 if (length == 1 && side == 1)//プレイヤー（仮）
                 {
                     PlayerNumber = 1;
@@ -79,7 +80,7 @@ public class BoardMaster : MonoBehaviour
                     MassArea[length, side] = PlayerNumber;
 
                 }
-
+                
                 if (length == 1 && side == 8)//プレイヤー（仮）
                 {
                     PlayerNumber = 1;
@@ -91,8 +92,9 @@ public class BoardMaster : MonoBehaviour
                     MassStatus[length, side] = Status.None;
 
                 }
+                */
 
-
+                    /*
                 if (length == 8 && side == 8)//エネミー（仮）
                 {
                     PlayerNumber = 2;
@@ -115,7 +117,7 @@ public class BoardMaster : MonoBehaviour
                     CharObj[length, side] = Charcter;
                     MassStatus[length, side] = Status.None;
                 }
-
+                */
                 count++;
                 if (masscolor == 0)
                 {
@@ -351,6 +353,24 @@ public class BoardMaster : MonoBehaviour
 
     }
 
+    //召喚したとき用
+    public void SetIsCharObj(int newnum, GameObject charobj)
+    {
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if (MassNum[length, side] == newnum)
+                {
+                    CharObj[length, side] = charobj;
+                    //Destroy(MassObj[length, side]);  
+                    //Instantiate(Kari, MassObj[length, side].transform.position, Quaternion.identity);//仮でしています
+                }
+
+            }
+        }
+
+    }
 
     public Vector3 GetPos(int num)
     {
@@ -526,7 +546,10 @@ public class BoardMaster : MonoBehaviour
         }
 
     }
-
+    /// <summary>
+    /// デッキから選択されたカードをタッチして召喚できる場所を表示させる
+    /// </summary>
+    /// <param name="num"></param>
     public void SummonsFiledPos(int num)
     {
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
@@ -540,9 +563,7 @@ public class BoardMaster : MonoBehaviour
                 {
                     if (MassArea[length, side] == TurnPlayer)
                     {
-                        Debug.Log(length);
-                        Debug.Log(side);
-                        Debug.Log("間");
+                      
                         Vector3 Pos = MassObj[length, side].transform.position;
                         Pos.z += 1;
                         Instantiate(Kari,Pos, Quaternion.identity);
@@ -561,7 +582,12 @@ public class BoardMaster : MonoBehaviour
         */
     }
 
-
+    /// <summary>
+    /// 召喚できるポジションのデータが読み込まれた後実行される
+    /// </summary>
+    /// <param name="num"></param>
+    /// <param name="length"></param>
+    /// <param name="side"></param>
     public void SetSummonsPosData(int num, int length, int side)
     {
         FieldSummonData[side, length] = num;
@@ -600,4 +626,17 @@ public class BoardMaster : MonoBehaviour
         }
     }
 
+    public void  SetMassArea(int num)
+    {
+        for(int length = 0; length<MaxLength;length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if(MassNum[length,side] == num)
+                {
+                    MassArea[length, side] = TurnPlayer;
+                }
+        }
+        }
+    }
 }

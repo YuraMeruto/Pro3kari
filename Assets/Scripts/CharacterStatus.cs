@@ -28,7 +28,7 @@ public class CharacterStatus : MonoBehaviour
         {
             for (int z = 0; z < 10; z++)
             {
-                MoveData[x, z] = Master.GetComponent<ReadCsv>().InputMoveData(x, z);
+                MoveData[x, z] = GetComponent<ReadCsv>().InputMoveData(x, z);
             }
         }
     }

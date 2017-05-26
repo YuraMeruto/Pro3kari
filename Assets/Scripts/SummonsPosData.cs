@@ -39,7 +39,6 @@ public class SummonsPosData : MonoBehaviour {
             countz++;
             ini = true;
         }
-        Debug.Log(IntData[0, 1]);
 
         MaxSideSize = copyx - 1;
         MaxLengthSize = copyz;
