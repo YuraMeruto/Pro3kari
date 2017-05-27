@@ -26,8 +26,8 @@ public class MoveData : MonoBehaviour
     {
 
         Master = GameObject.Find("Master");
-        MoveDataMaxLengthSize = Master.GetComponent<ReadCsv>().GetMaxLength();
-        MoveDataMaxSideSize = Master.GetComponent<ReadCsv>().GetMaxSide();
+        MoveDataMaxLengthSize = GetComponent<ReadCsv>().GetMaxLength();
+        MoveDataMaxSideSize = GetComponent<ReadCsv>().GetMaxSide();
 
         MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
         MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
@@ -35,7 +35,7 @@ public class MoveData : MonoBehaviour
         {
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
-                ReadMoveData[z, x] = Master.GetComponent<ReadCsv>().InputMoveData(z, x);
+                ReadMoveData[z, x] = GetComponent<ReadCsv>().InputMoveData(z, x);
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X

@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    private enum PlayerStatus { None, Choose };
+    private enum PlayerStatus { None, Choose,OpenCard,ChosingCard,Sumon };
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
     private int PlayerNumber;
@@ -95,6 +95,12 @@ public class Player : MonoBehaviour
                         CopyAtachMassObject = hit.collider.gameObject;
                         SwitchPlayerChoose();
                         break;
+
+                    case PlayerStatus.ChosingCard:
+                        AtachMassObject = hit.collider.gameObject;
+                      status = PlayerStatus.Sumon;
+                        SumonOnField();
+                        break;
                 }
             }
 
@@ -109,18 +115,23 @@ public class Player : MonoBehaviour
                 {
                     AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
                 }
+                status = PlayerStatus.OpenCard;
             }
 
             RaycastHit2D hit2d = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction, Mathf.Infinity, DeckCardLayer);
             if (hit2d.collider != null)
             {
-
+                switch (status) {
+                    case PlayerStatus.OpenCard:
                 int RaceNum;
                 Debug.Log("これはカードです");
                 AtachDeckCardObj = hit2d.collider.gameObject;
                 RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
                 MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
                 Debug.Log(AtachDeckCardObj);
+                        status = PlayerStatus.ChosingCard;
+                        break;
+            }
             }
 
         }
@@ -343,4 +354,26 @@ public class Player : MonoBehaviour
         return BattleResult.Draw;
     }
 
+
+    void SumonOnField()
+    {
+        AllSummonsCardDestroy();
+        AllIsMoveAreaDestroy();
+        AllKariDestroy();
+        AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
+        int DictionaryNumber = AtachDeckCardObj.GetComponent<IllustrationCard>().GetDictionaryNumber();
+        GameObject Sumon = MasterObject.GetComponent<CharacterMaster>().GettDictionaryCharacter(DictionaryNumber);
+       Vector3 SumonPos = AtachMassObject.transform.position;
+        SumonPos.z += 1;
+        Instantiate(Sumon,SumonPos,Sumon.transform.rotation);
+    }
+
+    void AllKariDestroy()
+    {
+        var clones = GameObject.FindGameObjectsWithTag("Kari");
+        foreach (var clone in clones)
+        {
+            Destroy(clone);
+        }
+    }
 }
