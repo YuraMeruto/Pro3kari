@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    private enum PlayerStatus { None, Choose,OpenCard,ChosingCard,Sumon };
+    private enum PlayerStatus { None, Choose, OpenCard, ChosingCard, Sumon };
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
     private int PlayerNumber;
@@ -64,8 +64,8 @@ public class Player : MonoBehaviour
         */
         if (Input.GetKeyDown(KeyCode.S))
         {
-            
-            MasterObject.GetComponent<BoardMaster>().DebugInst();
+
+            MasterObject.GetComponent<BoardMaster>().DebugDestroy();
             Debug.Log("aa");
         }
 
@@ -98,8 +98,9 @@ public class Player : MonoBehaviour
 
                     case PlayerStatus.ChosingCard:
                         AtachMassObject = hit.collider.gameObject;
-                      status = PlayerStatus.Sumon;
+                        status = PlayerStatus.Sumon;
                         SumonOnField();
+                        status = PlayerStatus.None;
                         break;
                 }
             }
@@ -121,17 +122,18 @@ public class Player : MonoBehaviour
             RaycastHit2D hit2d = Physics2D.Raycast((Vector2)ray.origin, (Vector2)ray.direction, Mathf.Infinity, DeckCardLayer);
             if (hit2d.collider != null)
             {
-                switch (status) {
+                switch (status)
+                {
                     case PlayerStatus.OpenCard:
-                int RaceNum;
-                Debug.Log("これはカードです");
-                AtachDeckCardObj = hit2d.collider.gameObject;
-                RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
-                MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
-                Debug.Log(AtachDeckCardObj);
+                        int RaceNum;
+                        Debug.Log("これはカードです");
+                        AtachDeckCardObj = hit2d.collider.gameObject;
+                        RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
+                        MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
+                        Debug.Log(AtachDeckCardObj);
                         status = PlayerStatus.ChosingCard;
                         break;
-            }
+                }
             }
 
         }
@@ -142,6 +144,7 @@ public class Player : MonoBehaviour
         CopyAtachMassObject = AtachMassObject;
         AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
         AtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(AtachMassNumber);
+        Debug.Log(AtachCharObject);
         bool IsEnemy = false;
         if (AtachCharObject != null)
         {
@@ -157,9 +160,9 @@ public class Player : MonoBehaviour
         {
             if (AtachCharObject != null)
             {
-
-                AtachCharObject.GetComponent<MoveData>().IsPossibleMove(AtachMassNumber);
-                status = PlayerStatus.Choose;
+                Debug.Log("aaa");
+                               AtachCharObject.GetComponent<MoveData>().IsPossibleMoveMove(AtachMassNumber);
+                               status = PlayerStatus.Choose;
             }
         }
     }
@@ -361,11 +364,14 @@ public class Player : MonoBehaviour
         AllIsMoveAreaDestroy();
         AllKariDestroy();
         AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
+        int GetPlayer = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
         int DictionaryNumber = AtachDeckCardObj.GetComponent<IllustrationCard>().GetDictionaryNumber();
         GameObject Sumon = MasterObject.GetComponent<CharacterMaster>().GettDictionaryCharacter(DictionaryNumber);
-       Vector3 SumonPos = AtachMassObject.transform.position;
+        Vector3 SumonPos = AtachMassObject.transform.position;
         SumonPos.z += 1;
-        Instantiate(Sumon,SumonPos,Sumon.transform.rotation);
+        GameObject  InstanceSumon = Instantiate(Sumon, SumonPos, Sumon.transform.rotation);
+        InstanceSumon.GetComponent<CharacterStatus>().SetPlayerNumber(GetPlayer);
+        MasterObject.GetComponent<BoardMaster>().SetIsCharObjSumon(AtachMassNumber, Sumon);
     }
 
     void AllKariDestroy()

@@ -7,10 +7,10 @@ public class CharacterStatus : MonoBehaviour
     [SerializeField]
     private int Role;
     [SerializeField]
-    GameObject Master;
-    private int[,] MoveData = new int[10, 10];
+    static GameObject  Master;
+    private  int[,] MoveData = new int[10, 10];
     [SerializeField]
-    private int PlayerNumber;//自分がしょぞくしているナンバー
+    private static int PlayerNumber;//自分がしょぞくしているナンバー
     [SerializeField]
     private int CharcterHp;
     [SerializeField]

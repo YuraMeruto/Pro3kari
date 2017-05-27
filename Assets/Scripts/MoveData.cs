@@ -13,9 +13,13 @@ public class MoveData : MonoBehaviour
     private int CSVMyPositionX;    //読み込んだデータの自分のポジション
     private int CSVMyPositionZ;    //読み込んだデータの自分のポジション
     private int PlayerNumber;//プレイヤー所属ナンバー
+    [SerializeField]
     private int MoveDataMaxLengthSize;
+    [SerializeField]
     private int MoveDataMaxSideSize;
+    [SerializeField]
     private int MaxMassSize;
+    [SerializeField]
     private int MaxMassLength;
     //CSVの自分のポジションとの差分を計算
     private int MassNumber;
@@ -31,6 +35,8 @@ public class MoveData : MonoBehaviour
 
         MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
         MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
+
+
         for (int z = 0; z <= MoveDataMaxLengthSize; z++)
         {
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
@@ -44,38 +50,46 @@ public class MoveData : MonoBehaviour
             }
         }
     }
-
+    void Update()
+    {
+        if(Master == null)
+        {
+            Debug.Log("NULLになったｙ");
+        }
+    }
     /// <summary>
     /// 自分がどこのますいるかを検索
     /// </summary>
     /// <param name="num"></param>
-    public void IsPossibleMove(int num)
+    public void IsPossibleMoveMove(int num)
     {
+        Master = GameObject.Find("Master");
+        Debug.Log(Master);
         MassNumber = num;
-        //自分がどこのますにいるかをけんさく
-        for (int length = 0; length < MaxMassLength; length++)
-        {
-            for (int side = 0; side < MaxMassSize; side++)
-            {
+          //自分がどこのますにいるかをけんさく
+          for (int length = 0; length < MaxMassLength; length++)
+          {
+              for (int side = 0; side < MaxMassSize; side++)
+              {
+                  Debug.Log("aa");
 
-                if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
-                {
-                    GameObject ret;
-                    ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
-                    if (ret == null)
-                    {
-                        break;
-                    }
-                    else
-                    {
-                        NowMyPosx = side;
-                        NowMyPosz = length;
-                        InstanceIsPossibleMoveArea();
-                    }
-                }
-            }
-        }
-
+                  if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
+                  {
+                      GameObject ret;
+                      ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
+                      if (ret == null)
+                      {
+                          break;
+                      }
+                      else
+                      {
+                          NowMyPosx = side;
+                          NowMyPosz = length;
+                          InstanceIsPossibleMoveArea();
+                      }
+                  }
+              }
+          }
     }
 
 
@@ -128,7 +142,7 @@ public class MoveData : MonoBehaviour
             KariZ++;
         }
     }
- public   bool OutSideTheArea(int InstanceLength, int InstanceSide)
+    public bool OutSideTheArea(int InstanceLength, int InstanceSide)
     {
         bool ret = true;
 

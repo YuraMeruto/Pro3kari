@@ -37,7 +37,7 @@ public class SummonsDeck : MonoBehaviour
         for (int xx = 0;xx <= MaxSide;xx++)
         {
             ReadDeckDataObj[xx] = Master.GetComponent<CharacterMaster>().GetIllustCharacter(ReadDeckData[xx,1]);
-            Debug.Log(ReadDeckDataObj[xx]);
+           // Debug.Log(ReadDeckDataObj[xx]);
         }
     }
 

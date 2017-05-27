@@ -20,7 +20,7 @@ public class BoardMaster : MonoBehaviour
     private GameObject[,] CharObj = new GameObject[10, 10];
     public int[,] MassNum = new int[10, 10];
     [SerializeField]
-    private int TurnPlayer;//現在どのプレイヤーが操作できるか確認
+    private static int TurnPlayer;//現在どのプレイヤーが操作できるか確認
     public enum Status { None, OK, NG, IsMoveArea };
     public Status[,] MassStatus = new Status[10, 10];
     private int PlayerNumber;
@@ -349,6 +349,22 @@ public class BoardMaster : MonoBehaviour
 
             }
         }
+    }
+    public void SetIsCharObjSumon(int newnum, GameObject charobj)
+    {
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+
+                if (MassNum[length, side] == newnum)
+                {
+                    CharObj[length, side] = charobj;
+                    Instantiate(Kari, MassObj[length, side].transform.position, Quaternion.identity);//仮でしています
+                }
+
+            }
+        }
 
     }
 
@@ -532,7 +548,7 @@ public class BoardMaster : MonoBehaviour
     {
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
-        
+
         for (int length = 0; length <= MaxLMap; length++)
         {
             for (int side = 0; side <= MaxSMap; side++)
@@ -546,7 +562,7 @@ public class BoardMaster : MonoBehaviour
                         Debug.Log("間");
                         Vector3 Pos = MassObj[length, side].transform.position;
                         Pos.z += 1;
-                        Instantiate(Kari,Pos, Quaternion.identity);
+                        Instantiate(Kari, Pos, Quaternion.identity);
                     }
                 }
             }
@@ -601,4 +617,20 @@ public class BoardMaster : MonoBehaviour
         }
     }
 
+  public  void DebugDestroy()
+    {
+        for (int length = 0; length < 8; length++)
+        {
+            for (int side = 0; side < 8; side++)
+            {
+                if(CharObj[length,side] != null)
+                {
+                    Destroy(MassObj[length,side]);
+                }
+            }
+
+        }
+    }
+
 }
+

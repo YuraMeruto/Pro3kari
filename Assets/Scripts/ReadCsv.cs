@@ -7,7 +7,9 @@ public class ReadCsv : MonoBehaviour
     [SerializeField]
     private string FileName;
     private int[,] IntData = new int[10, 10];
+    [SerializeField]
     private int MaxSideSize;
+    [SerializeField]
     private int MaxLengthSize;
 
     // Use this for initialization
@@ -44,6 +46,7 @@ public class ReadCsv : MonoBehaviour
      
         MaxSideSize = copyx-1;
         MaxLengthSize = copyz;
+        this.gameObject.GetComponent<MoveData>().enabled = true;
        // Debug.Log(MaxSideSize);
        // Debug.Log(MaxLengthSize);
 
