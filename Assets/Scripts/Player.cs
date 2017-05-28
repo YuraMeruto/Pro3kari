@@ -369,8 +369,9 @@ public class Player : MonoBehaviour
         GameObject Sumon = MasterObject.GetComponent<CharacterMaster>().GettDictionaryCharacter(DictionaryNumber);
         Vector3 SumonPos = AtachMassObject.transform.position;
         SumonPos.z += 1;
-        GameObject  InstanceSumon = Instantiate(Sumon, SumonPos, Sumon.transform.rotation);
+        GameObject  InstanceSumon = Instantiate(Sumon, SumonPos, Sumon.transform.rotation) as GameObject;
         InstanceSumon.GetComponent<CharacterStatus>().SetPlayerNumber(GetPlayer);
+        InstanceSumon.name = "aaa";
         MasterObject.GetComponent<BoardMaster>().SetIsCharObjSumon(AtachMassNumber, Sumon);
     }
 

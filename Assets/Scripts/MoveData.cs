@@ -66,24 +66,30 @@ public class MoveData : MonoBehaviour
         Master = GameObject.Find("Master");
         Debug.Log(Master);
         MassNumber = num;
+        Vector2 t = this.gameObject.transform.position;
+        t.y += 1;
+        this.gameObject.transform.position = t;
+        Debug.Log("おらおらおら");
+        Debug.Log(this.gameObject.name);
           //自分がどこのますにいるかをけんさく
           for (int length = 0; length < MaxMassLength; length++)
           {
               for (int side = 0; side < MaxMassSize; side++)
               {
-                  Debug.Log("aa");
 
                   if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
                   {
                       GameObject ret;
                       ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
+                  
                       if (ret == null)
                       {
                           break;
                       }
                       else
-                      {
-                          NowMyPosx = side;
+                    {
+                        Debug.Log(ret);
+                        NowMyPosx = side;
                           NowMyPosz = length;
                           InstanceIsPossibleMoveArea();
                       }

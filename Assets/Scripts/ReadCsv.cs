@@ -65,4 +65,9 @@ public class ReadCsv : MonoBehaviour
     {
         return MaxSideSize;
     }
+
+    public void Set()
+    {
+        MaxLengthSize = 0;
+    }
 }
