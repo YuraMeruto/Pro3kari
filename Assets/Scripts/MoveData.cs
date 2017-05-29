@@ -13,42 +13,50 @@ public class MoveData : MonoBehaviour
     private int CSVMyPositionX;    //読み込んだデータの自分のポジション
     private int CSVMyPositionZ;    //読み込んだデータの自分のポジション
     private int PlayerNumber;//プレイヤー所属ナンバー
-    private int MoveDataMaxLengthSize;
-    private int MoveDataMaxSideSize;
+    [SerializeField]
+    public int MoveDataMaxLengthSize;
+    [SerializeField]
+    public int MoveDataMaxSideSize;
+    [SerializeField]
     private int MaxMassSize;
+    [SerializeField]
     private int MaxMassLength;
     //CSVの自分のポジションとの差分を計算
     private int MassNumber;
     private int NowMyPosx = 0;
     private int NowMyPosz = 0;
+    private GameObject ReadObj;//Readcsvを呼び出すため仮でやっています。
+    [SerializeField]
+    private string FileName;
     // Use this for initialization
     void Start()
     {
-        Master = GameObject.Find("Master");      
+       
+
     }
     public void IniSet()
     {
-        Debug.Log("以降中");
-        MoveDataMaxLengthSize = GetComponent<ReadCsv>().GetMaxLength();
-        MoveDataMaxSideSize = GetComponent<ReadCsv>().GetMaxSide();
-        Debug.Log(Master.name);
+        Master = GameObject.Find("Master");
+        ReadObj.GetComponent<ReadCsv>().SetFileName(this.gameObject,FileName);
+        //MoveDataMaxLengthSize = ReadObj.GetComponent<ReadCsv>().MaxLengthSize;
+        //MoveDataMaxSideSize = ReadObj.GetComponent<ReadCsv>().MaxSideSize;
         MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
         MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
-        Debug.Log(MaxMassLength + "IniSet");
-        Debug.Log(MaxMassSize + "InSet");
         for (int z = 0; z <= MoveDataMaxLengthSize; z++)
         {
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
-                ReadMoveData[z, x] = GetComponent<ReadCsv>().InputMoveData(z, x);
-
+                ReadMoveData[z, x] = ReadObj.GetComponent<ReadCsv>().InputMoveData(z, x);
+                Debug.Log(ReadMoveData[z, x]);
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X
                     CSVMyPositionZ = z;//CSVのいる中心の座標Z
                 }
             }
+
         }
+
     }
 
     /// <summary>
@@ -58,13 +66,11 @@ public class MoveData : MonoBehaviour
     public void IsPossibleMove(int num)
     {
        // Master = GameObject.Find("Master");
-        Debug.Log(num);
+        //Debug.Log(num);
         MassNumber = num;
-        Debug.Log(Master);
-        MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
-        MaxMassSize = Master.GetComponent<BoardMaster>().GetMaxSide();
-        Debug.Log(MaxMassSize+"IspssibleMove");
-        Debug.Log(MaxMassLength+"IspssibleMove");
+        //Debug.Log(Master);
+        //Debug.Log(MaxMassSize+"IspssibleMove");
+        //Debug.Log(MaxMassLength+"IspssibleMove");
         //自分がどこのますにいるかをけんさく
         for (int length = 0; length < MaxMassLength; length++)
         {
@@ -99,19 +105,16 @@ public class MoveData : MonoBehaviour
     /// </summary>
     public void InstanceIsPossibleMoveArea()
     {
-        MoveDataMaxLengthSize = this.gameObject.GetComponent<ReadCsv>().GetMaxLength();
-        MoveDataMaxSideSize = this.gameObject.GetComponent<ReadCsv>().GetMaxSide();
-        Debug.Log(this.gameObject);
-        Debug.Log(this.gameObject.GetComponent<ReadCsv>().GetMaxLength());
-        Debug.Log(MoveDataMaxLengthSize);
+        Debug.Log(ReadObj.name);
         int KariZ = -MoveDataMaxLengthSize / 2;
         for (int length = 0; length <= MoveDataMaxLengthSize; length++)
         {
             int KariX = -MoveDataMaxSideSize / 2;
             for (int side = 0; side <= MoveDataMaxSideSize; side++)
             {
-                Debug.Log(ReadMoveData[length, side]);
-                if (ReadMoveData[length, side] == 1)
+                int karidata = ReadObj.GetComponent<MoveData>().GetReadMoveData(length,side);
+                Debug.Log(karidata);
+                if (karidata == 1)
                 {
                     bool IsOut = true;
                     IsOut = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
@@ -163,5 +166,13 @@ public class MoveData : MonoBehaviour
         return ret;
     }
 
+public void ReadSetObj(GameObject obj)
+    {
+        ReadObj = obj;
+    }
 
+public  int GetReadMoveData(int length,int side)
+    {
+        return  ReadMoveData[length, side];
+    }
 }

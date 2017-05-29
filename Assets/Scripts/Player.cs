@@ -32,6 +32,7 @@ public class Player : MonoBehaviour
     private enum BattleResult { Win, Lose, Draw };
     public GameObject kari;
     private GameObject ChoosingCardSummonObj;
+    private GameObject InstanceSumonObj;
     // Use this for initialization
     void Start()
     {
@@ -82,7 +83,7 @@ public class Player : MonoBehaviour
                     case PlayerStatus.None:
                         AtachMassObject = hit.collider.gameObject;
                         SwitchPlayerNone();
-                        Debug.Log(AtachCharObject);
+
                         break;
 
                     case PlayerStatus.Choose:
@@ -148,6 +149,7 @@ public class Player : MonoBehaviour
         {
             if (AtachCharObject != null)
             {
+                Debug.Log(AtachCharObject.name);
                 AtachCharObject.GetComponent<MoveData>().IsPossibleMove(AtachMassNumber);
                 status = PlayerStatus.Choose;
             }
@@ -372,9 +374,10 @@ public class Player : MonoBehaviour
         Debug.Log("召喚!");
         Vector3 SumonsPos = AtachMassObject.transform.position;
         SumonsPos.z += 1;
-        Instantiate(ChoosingCardSummonObj,SumonsPos, ChoosingCardSummonObj.transform.rotation);
+        InstanceSumonObj = Instantiate(ChoosingCardSummonObj,SumonsPos, ChoosingCardSummonObj.transform.rotation);
+        InstanceSumonObj.name = "aaa";
         int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
-        MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum,ChoosingCardSummonObj);
+        MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
         MasterObject.GetComponent<BoardMaster>().SetMassArea(MassNum);
         MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
         SetIniSummonCard();
@@ -395,6 +398,9 @@ public class Player : MonoBehaviour
     void SetIniSummonCard()
     {
         PlayerNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        ChoosingCardSummonObj.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
+        InstanceSumonObj.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
+        InstanceSumonObj.GetComponent<MoveData>().ReadSetObj(InstanceSumonObj);
+        InstanceSumonObj.GetComponent<ReadCsv>().SetTargetObj(InstanceSumonObj);
+        InstanceSumonObj.GetComponent<MoveData>().IniSet();
     }
 }
