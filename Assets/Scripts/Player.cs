@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
+    [SerializeField]
     private enum PlayerStatus { None, Choose,ShowCard,ChoosingCard,SummonCard};
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
@@ -59,8 +60,11 @@ public class Player : MonoBehaviour
         }
         */
         if (Input.GetKeyDown(KeyCode.S))
-        {            
-            MasterObject.GetComponent<BoardMaster>().DebugInst();
+        {
+            //            MasterObject.GetComponent<BoardMaster>().DebugInst();
+            // MasterObject.GetComponent<BoardMaster>().InstanceSP();
+            //    MasterObject.GetComponent<BoardMaster>().DebugMassArea();
+            Debug.Log(status);
         }
 
         MauseMove();
@@ -93,8 +97,8 @@ public class Player : MonoBehaviour
 
                     case PlayerStatus.ChoosingCard:
                         AtachMassObject = hit.collider.gameObject;
+                        AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
                         SummonCard();
-                        status = PlayerStatus.SummonCard;
                         break;
                 }
             }
@@ -107,7 +111,7 @@ public class Player : MonoBehaviour
                     case PlayerStatus.None:
                         AtachDeckObj = hit2.collider.gameObject;
                         SwitchDeck();
-                        status = PlayerStatus.ShowCard;
+
                         break;
                 }
             }
@@ -291,9 +295,9 @@ public class Player : MonoBehaviour
 
     void AllAtachNull()
     {
-        AtachCharObject = null;
-        CopyAtachMassObject = null;
-        AtachDeckObj = null;
+        //AtachCharObject = null;
+        //CopyAtachMassObject = null;
+        //AtachDeckObj = null;
     }
     /*
     void BattleScene()
@@ -355,6 +359,7 @@ public class Player : MonoBehaviour
         if (MasterTurnNumber == DeckNumber)
         {
             AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
+            status = PlayerStatus.ShowCard;
         }
     }//デッキを選択したら
 
@@ -363,7 +368,9 @@ public class Player : MonoBehaviour
         int RaceNum;
         int DictionaryNum;
         Debug.Log("これはカードです");
+        int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
         RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
+        Debug.Log(RaceNum);
         DictionaryNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetDictionaryNumber();
         MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
         ChoosingCardSummonObj = MasterObject.GetComponent<CharacterMaster>().GetSummonsCharacter(DictionaryNum);
@@ -371,19 +378,22 @@ public class Player : MonoBehaviour
 
     void SummonCard()
     {
-        Debug.Log("召喚!");
-        Vector3 SumonsPos = AtachMassObject.transform.position;
-        SumonsPos.z += 1;
-        InstanceSumonObj = Instantiate(ChoosingCardSummonObj,SumonsPos, ChoosingCardSummonObj.transform.rotation);
-        InstanceSumonObj.name = "aaa";
-        int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
-        MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
-        MasterObject.GetComponent<BoardMaster>().SetMassArea(MassNum);
-        MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
-        SetIniSummonCard();
-        AllIsMoveAreaDestroy();
-        AllSummonsCardDestroy();
-        AllKariDestroy();
+        bool ret = MasterObject.GetComponent<BoardMaster>().GetIsMove(AtachMassNumber);
+        if (ret)
+        {
+            Debug.Log("召喚!");
+            Vector3 SumonsPos = AtachMassObject.transform.position;
+            SumonsPos.z += 1;
+            InstanceSumonObj = Instantiate(ChoosingCardSummonObj, SumonsPos, ChoosingCardSummonObj.transform.rotation);
+            int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
+            MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
+            MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
+            SetIniSummonCard();
+            AllIsMoveAreaDestroy();
+            AllSummonsCardDestroy();
+            AllKariDestroy();
+            status = PlayerStatus.None;
+        }
     }
 
     void AllKariDestroy()
@@ -397,8 +407,9 @@ public class Player : MonoBehaviour
 
     void SetIniSummonCard()
     {
-        PlayerNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        InstanceSumonObj.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
+        int pnum;
+        pnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
+        InstanceSumonObj.GetComponent<CharacterStatus>().SetPlayerNumber(pnum);
         InstanceSumonObj.GetComponent<MoveData>().ReadSetObj(InstanceSumonObj);
         InstanceSumonObj.GetComponent<ReadCsv>().SetTargetObj(InstanceSumonObj);
         InstanceSumonObj.GetComponent<MoveData>().IniSet();

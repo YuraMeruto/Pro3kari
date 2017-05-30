@@ -47,7 +47,7 @@ public class MoveData : MonoBehaviour
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
                 ReadMoveData[z, x] = ReadObj.GetComponent<ReadCsv>().InputMoveData(z, x);
-                Debug.Log(ReadMoveData[z, x]);
+//                Debug.Log(ReadMoveData[z, x]);
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X
@@ -113,7 +113,7 @@ public class MoveData : MonoBehaviour
             for (int side = 0; side <= MoveDataMaxSideSize; side++)
             {
                 int karidata = ReadObj.GetComponent<MoveData>().GetReadMoveData(length,side);
-                Debug.Log(karidata);
+//                Debug.Log(karidata);
                 if (karidata == 1)
                 {
                     bool IsOut = true;
@@ -138,7 +138,6 @@ public class MoveData : MonoBehaviour
                         {
                             Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
                             InstancePos.z = 1.0f;
-                            Debug.Log("生成したよ");
                             GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
                             IsMoveObj.tag = "IsMovetag";
                             Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);

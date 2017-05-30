@@ -30,6 +30,8 @@ public class BoardMaster : MonoBehaviour
     private int MaxSide;
 
     private int MaxNumber;
+
+
     //マスのオブジェクト
     [SerializeField]
     private GameObject[] ObjMass = new GameObject[2];
@@ -42,6 +44,15 @@ public class BoardMaster : MonoBehaviour
 
     [SerializeField]
     private LayerMask MassLayer;
+
+    [SerializeField]
+    private GameObject SPObj;
+
+    [SerializeField]
+    private GameObject[] PlayerObj = new GameObject[0];
+
+    [SerializeField]
+    private GameObject SPPos;
     // Use this for initialization
     void Start()
     {
@@ -160,7 +171,11 @@ public class BoardMaster : MonoBehaviour
         GameObject Deck2 = Instantiate(DeckObj, DeckPos, DeckObj.transform.rotation);
         PlayerNumber = 2;
         Deck2.GetComponent<SummonsDeck>().SetPlayerNumber(PlayerNumber);
-        //生成終了
+        //デッキ生成終了
+
+        //SP設定
+        InstanceSP();
+
     }
 
     public int GetMaxNumber()
@@ -364,7 +379,7 @@ public class BoardMaster : MonoBehaviour
                 {
                     CharObj[length, side] = charobj;
                     //Destroy(MassObj[length, side]);  
-                    //Instantiate(Kari, MassObj[length, side].transform.position, Quaternion.identity);//仮でしています
+          
                 }
 
             }
@@ -396,6 +411,7 @@ public class BoardMaster : MonoBehaviour
 
     public void SetTurnPlayer()
     {
+        Debug.Log("ターンが変わったよ");
         switch (TurnPlayer)
         {
             case 1:
@@ -405,6 +421,7 @@ public class BoardMaster : MonoBehaviour
                 TurnPlayer = 1;
                 break;
         }
+        PlayerObj[TurnPlayer].GetComponent<SP>().ResetAddSP();
     }
 
     /*
@@ -450,7 +467,6 @@ public class BoardMaster : MonoBehaviour
             {
                 //                Vector3 pos = MassObj[EnemyMassLength + Movelength, EnemyMassSide + Moveside].transform.position;
                 //                pos.y = 1.0f;
-                //                Instantiate(Kari, pos, Quaternion.identity);
                 bool IsOutArea = OutSideTheArea(EnemyMassLength + Movelength, EnemyMassSide + Moveside);//敵のマスからみて最初から隣接して要る時
                 if (IsOutArea)
                 {
@@ -479,11 +495,11 @@ public class BoardMaster : MonoBehaviour
                         {
                             Debug.Log("隣接していません");
                             vec = MassObj[EnemyMassLength + Movelength, EnemyMassSide + Moveside].transform.position;
-                            Instantiate(Kari, vec, Quaternion.identity);
+               
                             int NewMassnum = GetMassNum(EnemyMassLength + Movelength, EnemyMassSide + Moveside);
                             //Vector3 pos = MassObj[EnemyMassLength + Movelength, EnemyMassSide + Moveside].transform.position;
                             //pos.y = 1.0f;
-                            //Instantiate(Kari, pos, Quaternion.identity);
+               
                             SetIsCharObj(NewMassnum, Playernum, PlayerPos);
                             return vec;
                         }
@@ -554,7 +570,8 @@ public class BoardMaster : MonoBehaviour
     {
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
-        
+        Debug.Log(MaxLMap);
+        Debug.Log(MaxSMap);
         for (int length = 0; length <= MaxLMap; length++)
         {
             for (int side = 0; side <= MaxSMap; side++)
@@ -563,10 +580,13 @@ public class BoardMaster : MonoBehaviour
                 {
                     if (MassArea[length, side] == TurnPlayer)
                     {
-                      
-                        Vector3 Pos = MassObj[length, side].transform.position;
-                        Pos.z += 1;
-                        Instantiate(Kari,Pos, Quaternion.identity);
+                        if (CharObj[length, side] == null)
+                        {
+                            Vector3 Pos = MassObj[length, side].transform.position;
+                            IsMoveMassObj[length, side] = true;
+                            Pos.z += 1;
+                            Instantiate(Kari, Pos, Quaternion.identity);
+                        }
                     }
                 }
             }
@@ -637,6 +657,35 @@ public class BoardMaster : MonoBehaviour
                     MassArea[length, side] = TurnPlayer;
                 }
         }
+        }
+    }
+
+    /// <summary>
+    /// SPObjを生成
+    /// </summary>
+    public void InstanceSP()
+    {
+        int SPCount;
+       SPCount = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
+        Vector3 InstancePos = SPPos.transform.position;
+        for(int count =0;count<SPCount;count++)
+        {
+            Instantiate(SPObj,InstancePos,SPObj.transform.rotation);
+            InstancePos.x--;
+        }
+
+    }
+    public void DebugMassArea()
+    {
+        for (int l = 0; l < MaxLength; l++)
+        {
+            for (int s = 0; s < MaxSide; s++)
+                if (MassArea[l, s] == 1)
+                {
+                    Vector3 p = MassObj[l, s].transform.position;
+                    p.z += 1;
+                    Instantiate(Kari, p, Quaternion.identity);
+                }
         }
     }
 }

@@ -110,7 +110,7 @@ public class ReadCsv : MonoBehaviour
                 TargetObj.GetComponent<ReadCsv>().SetData(countz, countx, int.Parse(col));
                 int a = TargetObj.GetComponent<ReadCsv>().InputMoveData(countz, countx);
                 countx++;
-                Debug.Log(a);
+     //           Debug.Log(a);
                 /*
                 if (countx > 4)
                 {  
