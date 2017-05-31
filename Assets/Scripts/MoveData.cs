@@ -113,7 +113,6 @@ public class MoveData : MonoBehaviour
             for (int side = 0; side <= MoveDataMaxSideSize; side++)
             {
                 int karidata = ReadObj.GetComponent<MoveData>().GetReadMoveData(length,side);
-//                Debug.Log(karidata);
                 if (karidata == 1)
                 {
                     bool IsOut = true;

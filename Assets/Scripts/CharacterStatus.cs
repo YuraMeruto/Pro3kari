@@ -17,6 +17,8 @@ public class CharacterStatus : MonoBehaviour
     private int CharcterAttack;
 
     [SerializeField]
+    private int SummoningSickness =0;
+    [SerializeField]
     private int SummonsCost;
     public List<SkillMaster> skills = new List<SkillMaster>();
     //Use this for initialization
@@ -34,10 +36,7 @@ public class CharacterStatus : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
-    {
 
-    }
 
     public void SetPlayerNumber(int SetNumber)
     {
@@ -83,5 +82,20 @@ public class CharacterStatus : MonoBehaviour
     public int GetRole()
     {
         return Role;
+    }
+
+    public int GetSummoningSickness()
+    {
+        return SummoningSickness;
+    }
+
+    public void SetSummoningSickness(int num)
+    {
+        SummoningSickness = num;
+    }
+
+    public void SubtractionSummoningSickness()
+    {
+        SummoningSickness--;
     }
 }

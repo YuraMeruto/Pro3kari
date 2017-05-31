@@ -31,7 +31,8 @@ public class BoardMaster : MonoBehaviour
 
     private int MaxNumber;
 
-
+    [SerializeField]
+    private List<GameObject> SummoningSicknessCharacterList = new List<GameObject>();
     //マスのオブジェクト
     [SerializeField]
     private GameObject[] ObjMass = new GameObject[2];
@@ -105,30 +106,30 @@ public class BoardMaster : MonoBehaviour
                 }
                 */
 
-                    /*
-                if (length == 8 && side == 8)//エネミー（仮）
-                {
-                    PlayerNumber = 2;
-                    Vector3 CharacterInstancePos = InstancePos;
-                    CharacterInstancePos.z = 1;
-                    GameObject Charcter = Instantiate(ObjCharcter[1], CharacterInstancePos, Quaternion.identity) as GameObject;
-                    Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
-                    CharObj[length, side] = Charcter;
-                    MassStatus[length, side] = Status.None;
+                /*
+            if (length == 8 && side == 8)//エネミー（仮）
+            {
+                PlayerNumber = 2;
+                Vector3 CharacterInstancePos = InstancePos;
+                CharacterInstancePos.z = 1;
+                GameObject Charcter = Instantiate(ObjCharcter[1], CharacterInstancePos, Quaternion.identity) as GameObject;
+                Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
+                CharObj[length, side] = Charcter;
+                MassStatus[length, side] = Status.None;
 
-                }
+            }
 
-                if (length == 8 && side == 1)//エネミー（仮）
-                {
-                    PlayerNumber = 2;
-                    Vector3 CharacterInstancePos = InstancePos;
-                    CharacterInstancePos.z = 1;
-                    GameObject Charcter = Instantiate(ObjCharcter[1], CharacterInstancePos, Quaternion.identity) as GameObject;
-                    Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
-                    CharObj[length, side] = Charcter;
-                    MassStatus[length, side] = Status.None;
-                }
-                */
+            if (length == 8 && side == 1)//エネミー（仮）
+            {
+                PlayerNumber = 2;
+                Vector3 CharacterInstancePos = InstancePos;
+                CharacterInstancePos.z = 1;
+                GameObject Charcter = Instantiate(ObjCharcter[1], CharacterInstancePos, Quaternion.identity) as GameObject;
+                Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
+                CharObj[length, side] = Charcter;
+                MassStatus[length, side] = Status.None;
+            }
+            */
                 count++;
                 if (masscolor == 0)
                 {
@@ -174,8 +175,7 @@ public class BoardMaster : MonoBehaviour
         //デッキ生成終了
 
         //SP設定
-        InstanceSP();
-
+        PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
     }
 
     public int GetMaxNumber()
@@ -379,7 +379,7 @@ public class BoardMaster : MonoBehaviour
                 {
                     CharObj[length, side] = charobj;
                     //Destroy(MassObj[length, side]);  
-          
+
                 }
 
             }
@@ -412,6 +412,8 @@ public class BoardMaster : MonoBehaviour
     public void SetTurnPlayer()
     {
         Debug.Log("ターンが変わったよ");
+        PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();//ターンが変わる前にいったん全部消す
+        AllSPObjDestroy();
         switch (TurnPlayer)
         {
             case 1:
@@ -421,7 +423,10 @@ public class BoardMaster : MonoBehaviour
                 TurnPlayer = 1;
                 break;
         }
+        TurnStart();
         PlayerObj[TurnPlayer].GetComponent<SP>().ResetAddSP();
+        PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
+        //   PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();
     }
 
     /*
@@ -495,11 +500,11 @@ public class BoardMaster : MonoBehaviour
                         {
                             Debug.Log("隣接していません");
                             vec = MassObj[EnemyMassLength + Movelength, EnemyMassSide + Moveside].transform.position;
-               
+
                             int NewMassnum = GetMassNum(EnemyMassLength + Movelength, EnemyMassSide + Moveside);
                             //Vector3 pos = MassObj[EnemyMassLength + Movelength, EnemyMassSide + Moveside].transform.position;
                             //pos.y = 1.0f;
-               
+
                             SetIsCharObj(NewMassnum, Playernum, PlayerPos);
                             return vec;
                         }
@@ -646,17 +651,17 @@ public class BoardMaster : MonoBehaviour
         }
     }
 
-    public void  SetMassArea(int num)
+    public void SetMassArea(int num)
     {
-        for(int length = 0; length<MaxLength;length++)
+        for (int length = 0; length < MaxLength; length++)
         {
             for (int side = 0; side < MaxSide; side++)
             {
-                if(MassNum[length,side] == num)
+                if (MassNum[length, side] == num)
                 {
                     MassArea[length, side] = TurnPlayer;
                 }
-        }
+            }
         }
     }
 
@@ -665,15 +670,10 @@ public class BoardMaster : MonoBehaviour
     /// </summary>
     public void InstanceSP()
     {
-        int SPCount;
-       SPCount = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
-        Vector3 InstancePos = SPPos.transform.position;
-        for(int count =0;count<SPCount;count++)
-        {
-            Instantiate(SPObj,InstancePos,SPObj.transform.rotation);
-            InstancePos.x--;
-        }
-
+        //  int SPCount;
+        // SPCount = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
+        //  Vector3 InstancePos = SPPos.transform.position;
+        //  PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
     }
     public void DebugMassArea()
     {
@@ -687,5 +687,55 @@ public class BoardMaster : MonoBehaviour
                     Instantiate(Kari, p, Quaternion.identity);
                 }
         }
+    }//デバック用
+
+    public bool UseSP(int costnum)
+    {
+        int NowSP = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
+        NowSP -= costnum;
+        if (NowSP >= 0)
+        {
+            PlayerObj[TurnPlayer].GetComponent<SP>().DestroyList(costnum);
+            return true;
+        }
+        return false;
+    }
+
+    public void AllSPObjDestroy()
+    {
+        var clones = GameObject.FindGameObjectsWithTag("SPTag");
+        foreach (var clone in clones)
+        {
+            Destroy(clone);
+        }
+    }
+
+    public void SetSummoningSicknessCharacterList(GameObject SetChar)
+    {
+        SummoningSicknessCharacterList.Add(SetChar);
+    }
+
+    public void SubtractionSummoningSicknessCharacterList()
+    {
+        for (int count = SummoningSicknessCharacterList.Count - 1; count >= 0; count--)
+        {
+            int pnum = SummoningSicknessCharacterList[count].GetComponent<CharacterStatus>().GetPlayerNumber();
+            if (pnum == TurnPlayer)
+            {
+                SummoningSicknessCharacterList[count].GetComponent<CharacterStatus>().SubtractionSummoningSickness();
+                int ssc = SummoningSicknessCharacterList[count].GetComponent<CharacterStatus>().GetSummoningSickness();
+
+                if (ssc == 0)
+                {
+                    SummoningSicknessCharacterList.RemoveAt(count);
+                }
+            }
+        }
+    }
+
+    public void TurnStart()
+
+    {
+        SubtractionSummoningSicknessCharacterList();
     }
 }

@@ -64,7 +64,6 @@ public class SummonsDeck : MonoBehaviour
                 InstancePos.y += 5;
                 InstancePos.x += 4;
             }
-            //        Instantiate(ReadDeckDataObj[0], InstancePos, ReadDeckDataObj[0].transform.rotation);
             for (int x = 0; x <= MaxSide; x++)
             {
                 Instantiate(ReadDeckDataObj[x], InstancePos, ReadDeckDataObj[0].transform.rotation);
@@ -89,5 +88,10 @@ public class SummonsDeck : MonoBehaviour
     public void SetIsCardShow()
     {
         IsCardShow = true;
+    }
+
+    public bool GetISCardShow()
+    {
+        return IsCardShow;
     }
 }

@@ -34,6 +34,10 @@ public class Player : MonoBehaviour
     public GameObject kari;
     private GameObject ChoosingCardSummonObj;
     private GameObject InstanceSumonObj;
+    private int SumonsCost;
+    private int RaceNum;
+    private GameObject MassObject;
+    private GameObject CopyMassObject;
     // Use this for initialization
     void Start()
     {
@@ -64,12 +68,33 @@ public class Player : MonoBehaviour
             //            MasterObject.GetComponent<BoardMaster>().DebugInst();
             // MasterObject.GetComponent<BoardMaster>().InstanceSP();
             //    MasterObject.GetComponent<BoardMaster>().DebugMassArea();
-            Debug.Log(status);
+            //Debug.Log(status);
+            MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
         }
 
         MauseMove();
     }
 
+    void MauseRay()
+    {
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
+        {
+            MassObject = hit.collider.gameObject;
+            if (CopyMassObject == null)
+            {
+                CopyMassObject = MassObject;
+            }
+            else
+            {
+                CopyMassObject = MassObject;
+            }
+            hit.collider.gameObject.GetComponent<Renderer>().material.color = new Color(1, 0, 0, 0);
+                  
+
+        }
+    }
     void MauseMove()
     {
         if (Input.GetMouseButtonDown(0))
@@ -106,8 +131,11 @@ public class Player : MonoBehaviour
             RaycastHit hit2;
             if (Physics.Raycast(ray, out hit2, Mathf.Infinity, DeckLayer))
             {
+                Debug.Log("これはデッキです");
                 switch(status)
                 {
+                    case PlayerStatus.ChoosingCard:
+                    case PlayerStatus.ShowCard:
                     case PlayerStatus.None:
                         AtachDeckObj = hit2.collider.gameObject;
                         SwitchDeck();
@@ -154,8 +182,12 @@ public class Player : MonoBehaviour
             if (AtachCharObject != null)
             {
                 Debug.Log(AtachCharObject.name);
-                AtachCharObject.GetComponent<MoveData>().IsPossibleMove(AtachMassNumber);
-                status = PlayerStatus.Choose;
+                int retnum = AtachCharObject.GetComponent<CharacterStatus>().GetSummoningSickness();
+                if (retnum == 0)
+                {
+                    AtachCharObject.GetComponent<MoveData>().IsPossibleMove(AtachMassNumber);
+                    status = PlayerStatus.Choose;
+                }
             }
         }
     }
@@ -353,24 +385,35 @@ public class Player : MonoBehaviour
 
     void SwitchDeck()
     {
-        Debug.Log("これはデッキです");
-        int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        int DeckNumber = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
-        if (MasterTurnNumber == DeckNumber)
+        bool IsOpen = AtachDeckObj.GetComponent<SummonsDeck>().GetISCardShow();
+        if (IsOpen)
         {
-            AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
-            status = PlayerStatus.ShowCard;
+            int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
+            int DeckNumber = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
+            if (MasterTurnNumber == DeckNumber)
+            {
+                AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
+                status = PlayerStatus.ShowCard;
+            }
+        }
+        else 
+        {
+            status = PlayerStatus.None;
+            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
+            AllIsMoveAreaDestroy();
+            AllSummonsCardDestroy();
+            AllKariDestroy();
         }
     }//デッキを選択したら
 
     void ChoosingCard()//カードを選択したら
     {
-        int RaceNum;
+
         int DictionaryNum;
         Debug.Log("これはカードです");
         int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
         RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
-        Debug.Log(RaceNum);
+        SumonsCost = AtachDeckCardObj.GetComponent<IllustrationCard>().GetSumonCos();
         DictionaryNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetDictionaryNumber();
         MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
         ChoosingCardSummonObj = MasterObject.GetComponent<CharacterMaster>().GetSummonsCharacter(DictionaryNum);
@@ -378,8 +421,11 @@ public class Player : MonoBehaviour
 
     void SummonCard()
     {
-        bool ret = MasterObject.GetComponent<BoardMaster>().GetIsMove(AtachMassNumber);
-        if (ret)
+        //召喚できるマスならば
+        bool retIsmove = MasterObject.GetComponent<BoardMaster>().GetIsMove(AtachMassNumber);
+        bool retIsSPCost = MasterObject.GetComponent<BoardMaster>().UseSP(SumonsCost);
+
+        if (retIsmove && retIsSPCost)
         {
             Debug.Log("召喚!");
             Vector3 SumonsPos = AtachMassObject.transform.position;
@@ -388,10 +434,16 @@ public class Player : MonoBehaviour
             int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
             MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
             MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
+            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
+            if(RaceNum !=1)//ポーン以外の召喚酔い
+            {
+                InstanceSumonObj.GetComponent<CharacterStatus>().SetSummoningSickness(1);
+                MasterObject.GetComponent<BoardMaster>().SetSummoningSicknessCharacterList(InstanceSumonObj);
+            }
             SetIniSummonCard();
             AllIsMoveAreaDestroy();
             AllSummonsCardDestroy();
-            AllKariDestroy();
+            AllKariDestroy();            
             status = PlayerStatus.None;
         }
     }
