@@ -62,7 +62,6 @@ public class SP : MonoBehaviour
         int copynum = num;
         for(int count = SPObjList.Count; num > 0;count--)
         {
-            Debug.Log("aaaaaaaaaa");
             Destroy(SPObjList[count-1]);
             SPObjList.RemoveAt(count-1);
             num--;

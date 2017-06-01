@@ -5,7 +5,7 @@ using UnityEngine;
 public class CharacterStatus : MonoBehaviour
 {
     [SerializeField]
-    private int Role;
+    private int Race;
     [SerializeField]
     GameObject Master;
     private int[,] MoveData = new int[10, 10];
@@ -21,6 +21,7 @@ public class CharacterStatus : MonoBehaviour
     [SerializeField]
     private int SummonsCost;
     public List<SkillMaster> skills = new List<SkillMaster>();
+    private bool IsFirstMove = true; //ポーン専用
     //Use this for initialization
     void Start()
     {
@@ -79,9 +80,9 @@ public class CharacterStatus : MonoBehaviour
 
     }
 
-    public int GetRole()
+    public int GetRace()
     {
-        return Role;
+        return Race;
     }
 
     public int GetSummoningSickness()
@@ -97,5 +98,11 @@ public class CharacterStatus : MonoBehaviour
     public void SubtractionSummoningSickness()
     {
         SummoningSickness--;
+    }
+
+    public void SetIsFirst()
+    {
+        IsFirstMove = false;
+        GetComponent<MoveData>().SetMoveData();
     }
 }

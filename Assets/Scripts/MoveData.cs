@@ -31,13 +31,13 @@ public class MoveData : MonoBehaviour
     // Use this for initialization
     void Start()
     {
-       
+
 
     }
     public void IniSet()
     {
         Master = GameObject.Find("Master");
-        ReadObj.GetComponent<ReadCsv>().SetFileName(this.gameObject,FileName);
+        ReadObj.GetComponent<ReadCsv>().SetFileName(this.gameObject, FileName);
         //MoveDataMaxLengthSize = ReadObj.GetComponent<ReadCsv>().MaxLengthSize;
         //MoveDataMaxSideSize = ReadObj.GetComponent<ReadCsv>().MaxSideSize;
         MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
@@ -47,14 +47,13 @@ public class MoveData : MonoBehaviour
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
                 ReadMoveData[z, x] = ReadObj.GetComponent<ReadCsv>().InputMoveData(z, x);
-//                Debug.Log(ReadMoveData[z, x]);
+                //                Debug.Log(ReadMoveData[z, x]);
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X
                     CSVMyPositionZ = z;//CSVのいる中心の座標Z
                 }
             }
-
         }
 
     }
@@ -65,7 +64,7 @@ public class MoveData : MonoBehaviour
     /// <param name="num"></param>
     public void IsPossibleMove(int num)
     {
-       // Master = GameObject.Find("Master");
+        // Master = GameObject.Find("Master");
         //Debug.Log(num);
         MassNumber = num;
         //Debug.Log(Master);
@@ -76,12 +75,13 @@ public class MoveData : MonoBehaviour
         {
             for (int side = 0; side < MaxMassSize; side++)
             {
-              
+
                 if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
                 {
 
                     GameObject ret;
                     ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
+                    int retracenum = ret.GetComponent<CharacterStatus>().GetRace();
                     if (ret == null)
                     {
                         break;
@@ -90,6 +90,11 @@ public class MoveData : MonoBehaviour
                     {
                         NowMyPosx = side;
                         NowMyPosz = length;
+//                        if (retracenum == 1)
+//                        {
+//                            PornIsPossible();
+//                            break;
+//                       }
                         InstanceIsPossibleMoveArea();
                     }
                 }
@@ -99,20 +104,20 @@ public class MoveData : MonoBehaviour
     }
 
 
+  
 
     /// <summary>
     /// 移動範囲の表示及び生成
     /// </summary>
     public void InstanceIsPossibleMoveArea()
     {
-        Debug.Log(ReadObj.name);
         int KariZ = -MoveDataMaxLengthSize / 2;
         for (int length = 0; length <= MoveDataMaxLengthSize; length++)
         {
             int KariX = -MoveDataMaxSideSize / 2;
             for (int side = 0; side <= MoveDataMaxSideSize; side++)
             {
-                int karidata = ReadObj.GetComponent<MoveData>().GetReadMoveData(length,side);
+                int karidata = ReadObj.GetComponent<MoveData>().GetReadMoveData(length, side);
                 if (karidata == 1)
                 {
                     bool IsOut = true;
@@ -120,9 +125,10 @@ public class MoveData : MonoBehaviour
                     Debug.Log(IsOut);
                     if (IsOut)
                     {
+             //           Destroy(Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX]);
+             //           Debug.Break();
                         bool ret = true;
                         ret = Master.GetComponent<BoardMaster>().GetMassStatusNone(NowMyPosz + KariZ, NowMyPosx + KariX);
-                        Debug.Log(ret);
                         GameObject IsCharObj = Master.GetComponent<BoardMaster>().GetCharObject(NowMyPosz + KariZ, NowMyPosx + KariX);
                         if (IsCharObj != null)
                         {
@@ -143,12 +149,48 @@ public class MoveData : MonoBehaviour
                         }
                     }
                 }
+
+
+                else if(karidata == 3)//ポーンの時だけ
+                {
+                    bool IsOut = true;
+                    IsOut = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
+                    Debug.Log(IsOut);
+                    if (IsOut)
+                    {
+
+                        GameObject IsCharObj = Master.GetComponent<BoardMaster>().GetCharObject(NowMyPosz + KariZ, NowMyPosx + KariX);
+               
+                        if (IsCharObj != null)
+                        {
+                            int IsCharNumber = IsCharObj.GetComponent<CharacterStatus>().GetPlayerNumber();
+                            int MyNumber = this.gameObject.GetComponent<CharacterStatus>().GetPlayerNumber();
+                            if (MyNumber != IsCharNumber)
+                            {
+                                Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                                InstancePos.z = 1.0f;
+                                GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                                IsMoveObj.tag = "IsMovetag";
+                                Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
+                            }
+                        }
+//                        if (ret)//移動できるマスであれば
+//                        {
+                           // Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                           // InstancePos.z = 1.0f;
+                           // GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                           // IsMoveObj.tag = "IsMovetag";
+                           // Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
+  //                      }
+                    }
+
+                }
                 KariX++;
             }
             KariZ++;
         }
     }
- public   bool OutSideTheArea(int InstanceLength, int InstanceSide)
+    public bool OutSideTheArea(int InstanceLength, int InstanceSide)
     {
         bool ret = true;
 
@@ -164,13 +206,108 @@ public class MoveData : MonoBehaviour
         return ret;
     }
 
-public void ReadSetObj(GameObject obj)
+    public void ReadSetObj(GameObject obj)
     {
         ReadObj = obj;
     }
 
-public  int GetReadMoveData(int length,int side)
+    public int GetReadMoveData(int length, int side)
     {
-        return  ReadMoveData[length, side];
+        return ReadMoveData[length, side];
+    }
+
+    /*
+    public void PornIsPossible()//ポーン専用移動範囲
+    {
+        Debug.Log("aaaaaaaa");
+        int KariZ = -MoveDataMaxLengthSize;
+        for (int length = 0; length <= MoveDataMaxLengthSize; length++)
+        {
+            //            int KariX = -MoveDataMaxSideSize / 2;
+            int KariX = -MoveDataMaxSideSize / 2;
+            for (int side = 0; side <= MoveDataMaxSideSize; side++)
+            {
+                if (ReadMoveData[length, side] == 1)
+                {
+                    bool isout = OutSideTheArea( NowMyPosz + KariZ,  NowMyPosx + KariX );
+                    if(isout)
+                    Destroy(Master.GetComponent<BoardMaster>().MassObj[ NowMyPosz + KariZ,  NowMyPosx  + KariX]);
+                }
+   
+                if (ReadMoveData[length, side] == 1)
+                {
+                    bool isout = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
+                    if (isout)//エリアがいであるかの判定
+                    {
+                        bool ret = Master.GetComponent<BoardMaster>().GetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX);
+                        if (ret)
+                        {
+                            Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                            InstancePos.z = 1.0f;
+                            GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                            IsMoveObj.tag = "IsMovetag";
+                            //                            Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + length, NowMyPosx + side, true);
+                        }
+                    }
+                }
+                else if (ReadMoveData[length, side] == 3)//敵がいた場合専用
+                {
+                    GameObject retobj = Master.GetComponent<BoardMaster>().GetCharObject(NowMyPosz + KariZ, NowMyPosx + KariX);
+                    {
+                        int retnumber = retobj.GetComponent<CharacterStatus>().GetPlayerNumber();
+                        int turn = Master.GetComponent<BoardMaster>().GetTurnPlayer();
+                        if (retnumber != turn)
+                        {
+                            Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                            InstancePos.z = 1.0f;
+                            GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                            IsMoveObj.tag = "IsMovetag";
+
+                        }
+                    }
+                }
+                    KariX++;
+                }
+                KariZ++;
+            }
+        
+        }
+   // public void PornIsPossibleMove(int num)//ポーン専用
+    {
+        MassNumber = num;
+        //自分がどこのますにいるかをけんさく
+        for (int length = 0; length < MaxMassLength; length++)
+        {
+            for (int side = 0; side < MaxMassSize; side++)
+            {
+
+                if (Master.GetComponent<BoardMaster>().MassNum[length, side] == num)
+                {
+
+                    GameObject ret;
+                    ret = Master.GetComponent<BoardMaster>().GetCharObject(length, side);
+                    int retracenum = ret.GetComponent<CharacterStatus>().GetRace();
+                    if (ret == null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        NowMyPosx = side;
+                        NowMyPosz = length;
+                        PornIsPossible();
+
+                    }
+                }
+            }
+        }
+
+    }
+*/
+    public void SetMoveData()//ポーン専用
+    {
+        Debug.Log("変更");
+        ReadMoveData[0, 1] = 0;
     }
 }
+

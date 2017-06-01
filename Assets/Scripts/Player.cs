@@ -68,8 +68,9 @@ public class Player : MonoBehaviour
             //            MasterObject.GetComponent<BoardMaster>().DebugInst();
             // MasterObject.GetComponent<BoardMaster>().InstanceSP();
             //    MasterObject.GetComponent<BoardMaster>().DebugMassArea();
-            //Debug.Log(status);
+            Debug.Log(status);
             MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+            status = PlayerStatus.None;
         }
 
         MauseMove();
@@ -177,6 +178,19 @@ public class Player : MonoBehaviour
             Debug.Log("キャラクターではないのでスルーします");
             IsEnemy = true;
         }
+        /*
+        if (AtachCharObject != null)
+        {
+            int racenum = AtachCharObject.GetComponent<CharacterStatus>().GetRace();
+
+            if (racenum == 1)//ポーンだったら
+            {
+                AtachCharObject.GetComponent<MoveData>().PornIsPossibleMove(AtachMassNumber);
+                status = PlayerStatus.Choose;
+                IsEnemy = true;
+            }
+        }
+        */
         if (!IsEnemy)
         {
             if (AtachCharObject != null)
@@ -298,9 +312,14 @@ public class Player : MonoBehaviour
                 MovePos = MasterObject.GetComponent<BoardMaster>().GetPos(CopyAttachMassNumber);
                 MovePos.z = 1.0f;
                 AtachCharObject.transform.position = MovePos;
+                if(RaceNum == 1)
+                {
+                    AtachCharObject.GetComponent<CharacterStatus>().SetIsFirst();
+                }
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                 MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+               
                 //                AtachCharObject.GetComponent<CharacterStatus>().SkillStart();
                 AllAtachNull();
                 status = PlayerStatus.None;

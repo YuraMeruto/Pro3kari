@@ -13,6 +13,20 @@ public class PornMoveStatus : MonoBehaviour {
         MoveStatus[2, 1] = 2;
     }
 
+public int GetMove(int length,int side)
+    {
+        return MoveStatus[length,side];
+    }
+    public void SetIsFirstMove()
+    {
+        IsFirstMove = false;
+        MoveStatus[0, 1] = 0;
+    }
+    public bool GetIsFirst()
+    {
+        return IsFirstMove;
+    }
+
 
 }
     

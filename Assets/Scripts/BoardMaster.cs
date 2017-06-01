@@ -738,4 +738,8 @@ public class BoardMaster : MonoBehaviour
     {
         SubtractionSummoningSicknessCharacterList();
     }
+    public void PornIsPossible()
+    {
+
+    }
 }
