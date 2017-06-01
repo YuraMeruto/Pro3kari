@@ -28,12 +28,7 @@ public class MoveData : MonoBehaviour
     private GameObject ReadObj;//Readcsvを呼び出すため仮でやっています。
     [SerializeField]
     private string FileName;
-    // Use this for initialization
-    void Start()
-    {
 
-
-    }
     public void IniSet()
     {
         Master = GameObject.Find("Master");
@@ -88,23 +83,114 @@ public class MoveData : MonoBehaviour
                     }
                     else
                     {
+                        int playernum = ret.GetComponent<CharacterStatus>().GetPlayerNumber();
                         NowMyPosx = side;
                         NowMyPosz = length;
-//                        if (retracenum == 1)
-//                        {
-//                            PornIsPossible();
-//                            break;
-//                       }
-                        InstanceIsPossibleMoveArea();
+                        //                        if (retracenum == 1)
+                        //                        {
+                        //                            PornIsPossible();
+                        //                            break;
+                        //                       }
+                        if (playernum == 2)
+                        {
+                            InstanceIsPossibleMoveArea();
+                        }
+
+                        else if (playernum == 1)
+                        {
+                            InstanceIsPossibleMoveAreaInverted();
+
+                        }
                     }
                 }
             }
         }
 
     }
+    public void InstanceIsPossibleMoveAreaInverted()//プレイヤー１の移動範囲の生成の仕方
+    {
+        Debug.Log("pureiya");
+        int KariZ = -MoveDataMaxLengthSize/2;
+        for (int length = MoveDataMaxLengthSize; length >= 0; length--)
+        {
+            int KariX = -MoveDataMaxSideSize / 2;
+            for (int side = MoveDataMaxSideSize; side >= 0; side--)
+            {
+                int karidata = ReadObj.GetComponent<MoveData>().GetReadMoveData(length, side);
+                if (karidata == 1)
+                {
+                    int resultz = NowMyPosz + KariZ;
+                    int resultx = NowMyPosx + KariX;
+                    bool IsOut = true;
+                    IsOut = OutSideTheArea(resultz, resultx);
+                    Debug.Log(IsOut);
+                    if (IsOut)
+                    {
+                        bool ret = true;
+                        ret = Master.GetComponent<BoardMaster>().GetMassStatusNone(resultz, resultx);
+                        GameObject IsCharObj = Master.GetComponent<BoardMaster>().GetCharObject(resultz, resultx);
+                        if (IsCharObj != null)
+                        {
+                            int IsCharNumber = IsCharObj.GetComponent<CharacterStatus>().GetPlayerNumber();
+                            int MyNumber = this.gameObject.GetComponent<CharacterStatus>().GetPlayerNumber();
+                            if (MyNumber == IsCharNumber)
+                            {
+                                ret = false;
+                            }
+                        }
+                        if (ret)//移動できるマスであれば
+                        {
+                            Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[resultz, resultx].transform.position;
+                            InstancePos.z = 1.0f;
+                            GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                            IsMoveObj.tag = "IsMovetag";
+                            Master.GetComponent<BoardMaster>().SetIsMove(resultz, resultx, true);
+                        }
+                    }
+                }
 
 
-  
+                else if (karidata == 3)//ポーンの時だけ
+                {
+                    bool IsOut = true;
+                    IsOut = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
+                    Debug.Log(IsOut);
+                    if (IsOut)
+                    {
+
+                        GameObject IsCharObj = Master.GetComponent<BoardMaster>().GetCharObject(NowMyPosz + KariZ, NowMyPosx + KariX);
+
+                        if (IsCharObj != null)
+                        {
+                            int IsCharNumber = IsCharObj.GetComponent<CharacterStatus>().GetPlayerNumber();
+                            int MyNumber = this.gameObject.GetComponent<CharacterStatus>().GetPlayerNumber();
+                            if (MyNumber != IsCharNumber)
+                            {
+                                Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                                InstancePos.z = 1.0f;
+                                GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                                IsMoveObj.tag = "IsMovetag";
+                                Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
+                            }
+                        }
+                        //                        if (ret)//移動できるマスであれば
+                        //                        {
+                        // Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                        // InstancePos.z = 1.0f;
+                        // GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                        // IsMoveObj.tag = "IsMovetag";
+                        // Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
+                        //                      }
+                    }
+
+                }
+                KariX++;
+            }
+            KariZ++;
+        }
+    }
+
+
 
     /// <summary>
     /// 移動範囲の表示及び生成
@@ -125,8 +211,8 @@ public class MoveData : MonoBehaviour
                     Debug.Log(IsOut);
                     if (IsOut)
                     {
-             //           Destroy(Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX]);
-             //           Debug.Break();
+                        //           Destroy(Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX]);
+                        //           Debug.Break();
                         bool ret = true;
                         ret = Master.GetComponent<BoardMaster>().GetMassStatusNone(NowMyPosz + KariZ, NowMyPosx + KariX);
                         GameObject IsCharObj = Master.GetComponent<BoardMaster>().GetCharObject(NowMyPosz + KariZ, NowMyPosx + KariX);
@@ -151,7 +237,7 @@ public class MoveData : MonoBehaviour
                 }
 
 
-                else if(karidata == 3)//ポーンの時だけ
+                else if (karidata == 3)//ポーンの時だけ
                 {
                     bool IsOut = true;
                     IsOut = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
@@ -160,7 +246,7 @@ public class MoveData : MonoBehaviour
                     {
 
                         GameObject IsCharObj = Master.GetComponent<BoardMaster>().GetCharObject(NowMyPosz + KariZ, NowMyPosx + KariX);
-               
+
                         if (IsCharObj != null)
                         {
                             int IsCharNumber = IsCharObj.GetComponent<CharacterStatus>().GetPlayerNumber();
@@ -174,14 +260,14 @@ public class MoveData : MonoBehaviour
                                 Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
                             }
                         }
-//                        if (ret)//移動できるマスであれば
-//                        {
-                           // Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
-                           // InstancePos.z = 1.0f;
-                           // GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
-                           // IsMoveObj.tag = "IsMovetag";
-                           // Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
-  //                      }
+                        //                        if (ret)//移動できるマスであれば
+                        //                        {
+                        // Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
+                        // InstancePos.z = 1.0f;
+                        // GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                        // IsMoveObj.tag = "IsMovetag";
+                        // Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
+                        //                      }
                     }
 
                 }
