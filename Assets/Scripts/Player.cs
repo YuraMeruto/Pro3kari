@@ -71,6 +71,7 @@ public class Player : MonoBehaviour
             Debug.Log(status);
             MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
             status = PlayerStatus.None;
+            AtachCharObject.GetComponent<CharacterStatus>().skill.AtTheStart();
         }
 
         MauseMove();
@@ -446,6 +447,7 @@ public class Player : MonoBehaviour
 
         if (retIsmove && retIsSPCost)
         {
+            MasterObject.GetComponent<BoardMaster>().SPDestroyCall();
             Debug.Log("召喚!");
             Vector3 SumonsPos = AtachMassObject.transform.position;
             SumonsPos.z += 1;

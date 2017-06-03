@@ -21,6 +21,7 @@ public class CharacterStatus : MonoBehaviour
     [SerializeField]
     private int SummonsCost;
     public List<SkillMaster> skills = new List<SkillMaster>();
+    public SkillBase skill;
     private bool IsFirstMove = true; //ポーン専用
     //Use this for initialization
     void Start()

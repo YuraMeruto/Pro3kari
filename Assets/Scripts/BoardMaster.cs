@@ -14,7 +14,7 @@ public class BoardMaster : MonoBehaviour
     private int[,] IntData = new int[10, 10];
     private int[,] FieldSummonData = new int[10, 10];
     public GameObject Kari;
-    private int[,] MassArea = new int[10, 10];
+    private int[,] MassArea = new int[10, 10];//自軍か敵軍の判別用
     public GameObject[,] MassObj = new GameObject[10, 10];
     public bool[,] IsMoveMassObj = new bool[10, 10];
     private GameObject[,] CharObj = new GameObject[10, 10];
@@ -29,6 +29,7 @@ public class BoardMaster : MonoBehaviour
     [SerializeField]
     private int MaxSide;
 
+    private int CopyCost;
     private int MaxNumber;
 
     [SerializeField]
@@ -54,6 +55,10 @@ public class BoardMaster : MonoBehaviour
 
     [SerializeField]
     private GameObject SPPos;
+
+    [SerializeField]
+    private List<GameObject> AtTheStartSkillList = new List<GameObject>();
+
     // Use this for initialization
     void Start()
     {
@@ -78,6 +83,7 @@ public class BoardMaster : MonoBehaviour
                 MassObj[length, side] = Mass;
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
+               
                 //  if (length == 2)//ポーンの初期の生成場所
                 /*
                 if (length == 1 && side == 1)//プレイヤー（仮）
@@ -411,6 +417,7 @@ public class BoardMaster : MonoBehaviour
 
     public void SetTurnPlayer()
     {
+        
         Debug.Log("ターンが変わったよ");
         PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();//ターンが変わる前にいったん全部消す
         AllSPObjDestroy();
@@ -429,13 +436,6 @@ public class BoardMaster : MonoBehaviour
         //   PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();
     }
 
-    /*
-    public void SetTurnPlayer(int num)
-    {
-        TurnPlayer = num;
-        Debug.Log(TurnPlayer);
-    }
-    */
     public int GetTurnPlayer()
 
     {
@@ -691,11 +691,11 @@ public class BoardMaster : MonoBehaviour
 
     public bool UseSP(int costnum)
     {
+        CopyCost = costnum;
         int NowSP = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
         NowSP -= costnum;
         if (NowSP >= 0)
         {
-            PlayerObj[TurnPlayer].GetComponent<SP>().DestroyList(costnum);
             return true;
         }
         return false;
@@ -741,5 +741,9 @@ public class BoardMaster : MonoBehaviour
     public void PornIsPossible()
     {
 
+    }
+    public void SPDestroyCall()
+    {
+        PlayerObj[TurnPlayer].GetComponent<SP>().DestroyList(CopyCost);
     }
 }
