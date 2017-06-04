@@ -11,7 +11,7 @@ public class PornS : SkillBase {
 
     }
     public override void AtTheStart() {
-        Debug.Log("ポーンだよ");
+        Debug.Log("ポーンのスタート");
     }
 
     public override void AtTheEnd()
@@ -25,4 +25,18 @@ public class PornS : SkillBase {
         Debug.Log("ポーンが動き始めるよ");
     }
 
+    public override void MoveEnd()
+    {
+        Debug.Log("ポーンの動き終わるよ");
+    }
+
+    public override void BattleStart()
+    {
+        Debug.Log("ポーンのバトルスタート");
+    }
+
+    public override void BattleEnd()
+    {
+        Debug.Log("ポーンのバトル修了");
+    }
 }

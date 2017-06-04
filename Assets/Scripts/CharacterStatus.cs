@@ -20,7 +20,7 @@ public class CharacterStatus : MonoBehaviour
     private int SummoningSickness =0;
     [SerializeField]
     private int SummonsCost;
-    public List<SkillMaster> skills = new List<SkillMaster>();
+
     public SkillBase skill;
     private bool IsFirstMove = true; //ポーン専用
     //Use this for initialization
@@ -69,11 +69,6 @@ public class CharacterStatus : MonoBehaviour
     public void SetAttack(int attack)
     {
         CharcterAttack = attack;
-    }
-
-    public void SkillStart()
-    {
-        skills[0].Init();
     }
 
     public void SetRole()

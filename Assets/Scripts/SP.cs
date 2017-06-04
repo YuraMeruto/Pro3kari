@@ -6,7 +6,7 @@ public class SP : MonoBehaviour
 {
 
     [SerializeField]
-    private int SPCount ;
+    private int SPCount;
     private int PlayerNumber;
     [SerializeField]
     private int CopySP;
@@ -15,6 +15,11 @@ public class SP : MonoBehaviour
     [SerializeField]
     private GameObject SPPos;
 
+    [SerializeField]
+    private int SPMax;
+
+    [SerializeField]
+    private int APStart;
     [SerializeField]
     private List<GameObject> SPObjList = new List<GameObject>();
 
@@ -43,10 +48,16 @@ public class SP : MonoBehaviour
 
     public void ResetAddSP()
     {
-        SPCount = CopySP;
-        SPCount += 1;
-        CopySP = SPCount;
-
+        if (CopySP <= SPMax)
+        {
+            SPCount = CopySP;
+            SPCount += 1;
+            CopySP = SPCount;
+            if (SPCount >= APStart)
+            {
+                GetComponent<AP>().AddAP();
+            }
+        }
     }
 
     public void SetSPArray()
@@ -56,17 +67,17 @@ public class SP : MonoBehaviour
             SPObjList.Add(SPObj);
         }
     }
-        
-    public void  DestroyList(int num)
+
+    public void DestroyList(int num)
     {
         int copynum = num;
-        for(int count = SPObjList.Count; num > 0;count--)
+        for (int count = SPObjList.Count; num > 0; count--)
         {
-            Destroy(SPObjList[count-1]);
-            SPObjList.RemoveAt(count-1);
+            Destroy(SPObjList[count - 1]);
+            SPObjList.RemoveAt(count - 1);
             num--;
         }
-        SPCount = SPObjList.Count ;
+        SPCount = SPObjList.Count;
     }
 
     public void ClearList()
@@ -87,10 +98,10 @@ public class SP : MonoBehaviour
     public void InstanceSPObj()
     {
         Vector3 InstancePos = SPPos.transform.position;
-             
-        for (int count =0;count<SPCount;count++)
+
+        for (int count = 0; count < SPCount; count++)
         {
-            GameObject ObjName = Instantiate(SPObj, InstancePos, SPObj.transform.rotation);          
+            GameObject ObjName = Instantiate(SPObj, InstancePos, SPObj.transform.rotation);
             InstancePos.x--;
             SPObjList.Add(ObjName);
         }

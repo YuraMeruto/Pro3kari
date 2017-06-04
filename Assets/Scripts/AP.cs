@@ -21,9 +21,9 @@ public class AP : MonoBehaviour
     private GameObject InstanceObj;
     private int CopyCount;
 
-    public void SetAP()
+    public void SetAP(int num)
     {
-
+        APCount += num;       
     }
     public void AddAP()
     {

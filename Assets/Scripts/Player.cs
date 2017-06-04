@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
     [SerializeField]
-    private enum PlayerStatus { None, Choose,ShowCard,ChoosingCard,SummonCard};
+    private enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard };
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
     private int PlayerNumber;
@@ -38,40 +38,29 @@ public class Player : MonoBehaviour
     private int RaceNum;
     private GameObject MassObject;
     private GameObject CopyMassObject;
+    [SerializeField]
+    private LayerMask TurnObjLayer;
     // Use this for initialization
     void Start()
     {
         MasterObject = GameObject.Find("Master");
-    
+
     }
 
     // Update is called once per frame
     void Update()
     {
-        /*
-        if(Input.GetKeyDown(KeyCode.A))
-        {
 
-            var clones = GameObject.FindGameObjectsWithTag("Kari");
-            foreach (var clone in clones)
-            {
-                Destroy(clone);
-            }
-        }
-        if (Input.GetKeyDown(KeyCode.S))
-        {
-            MasterObject.GetComponent<BoardMaster>().AllInstance(kari);
-        }
-        */
         if (Input.GetKeyDown(KeyCode.S))
         {
             //            MasterObject.GetComponent<BoardMaster>().DebugInst();
             // MasterObject.GetComponent<BoardMaster>().InstanceSP();
             //    MasterObject.GetComponent<BoardMaster>().DebugMassArea();
-            Debug.Log(status);
-            MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
-            status = PlayerStatus.None;
-            AtachCharObject.GetComponent<CharacterStatus>().skill.AtTheStart();
+            //  Debug.Log(status);
+            //  MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+            //  status = PlayerStatus.None;
+            //  AtachCharObject.GetComponent<CharacterStatus>().skill.AtTheStart();
+            MasterObject.GetComponent<BoardMaster>().DebugObj();
         }
 
         MauseMove();
@@ -93,7 +82,7 @@ public class Player : MonoBehaviour
                 CopyMassObject = MassObject;
             }
             hit.collider.gameObject.GetComponent<Renderer>().material.color = new Color(1, 0, 0, 0);
-                  
+
 
         }
     }
@@ -105,7 +94,13 @@ public class Player : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             RaycastHit hit;
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, TurnObjLayer))
+            {
+                Debug.Log("これはターン修了のオブジェクトです。");
+                MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+            }
+
+                if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
             {
                 Debug.Log("オブジェクトです");
                 switch (status)
@@ -134,7 +129,7 @@ public class Player : MonoBehaviour
             if (Physics.Raycast(ray, out hit2, Mathf.Infinity, DeckLayer))
             {
                 Debug.Log("これはデッキです");
-                switch(status)
+                switch (status)
                 {
                     case PlayerStatus.ChoosingCard:
                     case PlayerStatus.ShowCard:
@@ -158,7 +153,7 @@ public class Player : MonoBehaviour
                         ChoosingCard();
                         status = PlayerStatus.ChoosingCard;
                         break;
-                }          
+                }
             }
         }
     }
@@ -243,11 +238,12 @@ public class Player : MonoBehaviour
                 {
                     IsEnemyObj = null;
                 }
+                AtachCharObject.GetComponent<CharacterStatus>().skill.BattleStart();//戦闘が始まったときのキャラクターのスキルの処理
                 var BattleRet = ResultBattleScene();
                 switch (BattleRet)
                 {
 
-                    case BattleResult.Win:
+                    case BattleResult.Win://先に攻撃したキャラクターが勝った場合
                         Destroy(IsEnemyObj);
                         AllIsMoveAreaDestroy();
                         AllSummonsCardDestroy();
@@ -265,7 +261,7 @@ public class Player : MonoBehaviour
                         status = PlayerStatus.None;
                         break;
 
-                    case BattleResult.Lose:
+                    case BattleResult.Lose://先に攻撃したキャラクターが負けた場合
                         AllIsMoveAreaDestroy();
                         AllSummonsCardDestroy();
                         if (AtachDeckObj != null)
@@ -280,7 +276,7 @@ public class Player : MonoBehaviour
                         status = PlayerStatus.None;
                         break;
 
-                    case BattleResult.Draw:
+                    case BattleResult.Draw://引き分けの場合
                         MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                         AllIsMoveAreaDestroy();
                         AllSummonsCardDestroy();
@@ -313,14 +309,16 @@ public class Player : MonoBehaviour
                 MovePos = MasterObject.GetComponent<BoardMaster>().GetPos(CopyAttachMassNumber);
                 MovePos.z = 1.0f;
                 AtachCharObject.transform.position = MovePos;
-                if(RaceNum == 1)
+                if (RaceNum == 1)//移動するキャラクターがポーンの場合
                 {
                     AtachCharObject.GetComponent<CharacterStatus>().SetIsFirst();
                 }
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
+                AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
                 MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
-               
+
+
                 //                AtachCharObject.GetComponent<CharacterStatus>().SkillStart();
                 AllAtachNull();
                 status = PlayerStatus.None;
@@ -416,7 +414,7 @@ public class Player : MonoBehaviour
                 status = PlayerStatus.ShowCard;
             }
         }
-        else 
+        else
         {
             status = PlayerStatus.None;
             AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
@@ -456,7 +454,7 @@ public class Player : MonoBehaviour
             MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
             MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
             AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-            if(RaceNum !=1)//ポーン以外の召喚酔い
+            if (RaceNum != 1)//ポーン以外の召喚酔い
             {
                 InstanceSumonObj.GetComponent<CharacterStatus>().SetSummoningSickness(1);
                 MasterObject.GetComponent<BoardMaster>().SetSummoningSicknessCharacterList(InstanceSumonObj);
@@ -464,7 +462,7 @@ public class Player : MonoBehaviour
             SetIniSummonCard();
             AllIsMoveAreaDestroy();
             AllSummonsCardDestroy();
-            AllKariDestroy();            
+            AllKariDestroy();
             status = PlayerStatus.None;
         }
     }

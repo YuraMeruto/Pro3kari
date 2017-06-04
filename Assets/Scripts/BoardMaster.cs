@@ -31,7 +31,8 @@ public class BoardMaster : MonoBehaviour
 
     private int CopyCost;
     private int MaxNumber;
-
+    [SerializeField]
+    private GameObject PlayerTurnUI;
     [SerializeField]
     private List<GameObject> SummoningSicknessCharacterList = new List<GameObject>();
     //マスのオブジェクト
@@ -99,32 +100,7 @@ public class BoardMaster : MonoBehaviour
 
                 }
                 
-                if (length == 1 && side == 8)//プレイヤー（仮）
-                {
-                    PlayerNumber = 1;
-                    Vector3 CharacterInstancePos = InstancePos;
-                    CharacterInstancePos.z = 1;
-                    GameObject Charcter = Instantiate(ObjCharcter[0], CharacterInstancePos, Quaternion.identity) as GameObject;
-                    Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
-                    CharObj[length, side] = Charcter;
-                    MassStatus[length, side] = Status.None;
-
-                }
-                */
-
-                /*
-            if (length == 8 && side == 8)//エネミー（仮）
-            {
-                PlayerNumber = 2;
-                Vector3 CharacterInstancePos = InstancePos;
-                CharacterInstancePos.z = 1;
-                GameObject Charcter = Instantiate(ObjCharcter[1], CharacterInstancePos, Quaternion.identity) as GameObject;
-                Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
-                CharObj[length, side] = Charcter;
-                MassStatus[length, side] = Status.None;
-
-            }
-
+        
             if (length == 8 && side == 1)//エネミー（仮）
             {
                 PlayerNumber = 2;
@@ -167,7 +143,7 @@ public class BoardMaster : MonoBehaviour
 
         }
         MaxNumber = count;
-        //デッキの生成    
+        //デッキの生成開始   
         DeckPos = MassObj[0, 0].transform.position;
         DeckPos.x = DeckPos.x - 3;
         GameObject Deck1 = Instantiate(DeckObj, DeckPos, DeckObj.transform.rotation);
@@ -182,6 +158,7 @@ public class BoardMaster : MonoBehaviour
 
         //SP設定
         PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
+        SetTurnPlayer();
     }
 
     public int GetMaxNumber()
@@ -419,18 +396,28 @@ public class BoardMaster : MonoBehaviour
     {
         
         Debug.Log("ターンが変わったよ");
+        GetComponent<SkillsMaster>().EndSkills();//登録されているキャラクターのスキル発動
         PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();//ターンが変わる前にいったん全部消す
         AllSPObjDestroy();
         switch (TurnPlayer)
         {
             case 1:
                 TurnPlayer = 2;
+                PlayerTurnUI.GetComponent<PlayerTurn>().SetColorBlue();
+                PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownTrue();
+                PlayerTurnUI.GetComponent<PlayerTurn>().SetText("プレイヤー2のターン");
+               // PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownFalse();
                 break;
             case 2:
                 TurnPlayer = 1;
+                PlayerTurnUI.GetComponent<PlayerTurn>().SetColorRed();
+                PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownTrue();
+                PlayerTurnUI.GetComponent<PlayerTurn>().SetText("プレイヤー1のターン");
+               // PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownFalse();
                 break;
         }
         TurnStart();
+        GetComponent<SkillsMaster>().StartSkill();//登録されているキャラクターのスキル発動
         PlayerObj[TurnPlayer].GetComponent<SP>().ResetAddSP();
         PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
         //   PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();
@@ -745,5 +732,24 @@ public class BoardMaster : MonoBehaviour
     public void SPDestroyCall()
     {
         PlayerObj[TurnPlayer].GetComponent<SP>().DestroyList(CopyCost);
+    }
+
+    public void DebugObj()
+    {
+        for (int length = 0; length < 10; length++)
+        {
+            for (int size = 0; size < 10; size++)
+            {
+                if (CharObj[length,size] !=null)
+                {
+                    Instantiate(Kari,CharObj[length,size].transform.position,Quaternion.identity);
+                }
+            }
+        }
+    }
+
+    public void CharacterTurnStartSkill()
+    {
+
     }
 }
