@@ -87,34 +87,6 @@ public class BoardMaster : MonoBehaviour
                 MassObj[length, side] = Mass;
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
-               
-                //  if (length == 2)//ポーンの初期の生成場所
-                /*
-                if (length == 1 && side == 1)//プレイヤー（仮）
-                {
-                    PlayerNumber = 1;
-                    Vector3 CharacterInstancePos = InstancePos;
-                    CharacterInstancePos.z = 1;
-                    GameObject Charcter = Instantiate(ObjCharcter[0], CharacterInstancePos, Quaternion.identity) as GameObject;
-                    Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
-                    CharObj[length, side] = Charcter;
-                    MassStatus[length, side] = Status.None;
-                    MassArea[length, side] = PlayerNumber;
-
-                }
-                
-        
-            if (length == 8 && side == 1)//エネミー（仮）
-            {
-                PlayerNumber = 2;
-                Vector3 CharacterInstancePos = InstancePos;
-                CharacterInstancePos.z = 1;
-                GameObject Charcter = Instantiate(ObjCharcter[1], CharacterInstancePos, Quaternion.identity) as GameObject;
-                Charcter.GetComponent<CharacterStatus>().SetPlayerNumber(PlayerNumber);
-                CharObj[length, side] = Charcter;
-                MassStatus[length, side] = Status.None;
-            }
-            */
                 count++;
                 if (masscolor == 0)
                 {
