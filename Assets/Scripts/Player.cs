@@ -22,7 +22,7 @@ public class Player : MonoBehaviour
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
     [SerializeField]
-    private enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard };
+    private enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate };
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
     private int PlayerNumber;
@@ -39,12 +39,19 @@ public class Player : MonoBehaviour
     private GameObject MassObject;
     private GameObject CopyMassObject;
     [SerializeField]
+    private LayerMask YesLayer;
+    [SerializeField]
+    private LayerMask NoLayer;
+    [SerializeField]
     private LayerMask TurnObjLayer;
+    private PhaseMaster.Phase NowPhase;
+    [SerializeField]
+    private LayerMask NextPhaseLayer;
     // Use this for initialization
     void Start()
     {
         MasterObject = GameObject.Find("Master");
-
+        NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
     }
 
     // Update is called once per frame
@@ -63,9 +70,24 @@ public class Player : MonoBehaviour
             MasterObject.GetComponent<BoardMaster>().DebugObj();
         }
 
+
+        switch (NowPhase)
+        {
+            case PhaseMaster.Phase.Main1:
+            case PhaseMaster.Phase.Main2:
+                break;
+
+            case PhaseMaster.Phase.Move:
+                break;
+
+            case PhaseMaster.Phase.TurnEnd:
+                //  MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+                break;
+        }
+
+
         MauseMove();
     }
-
     void MauseRay()
     {
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -94,21 +116,34 @@ public class Player : MonoBehaviour
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
             RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, NextPhaseLayer))
+            {
+                Debug.Log("次のフェイズへ移行します");
+                MasterObject.GetComponent<PhaseMaster>().NextFase();
+                NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
+            }
+
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, TurnObjLayer))
             {
                 Debug.Log("これはターン修了のオブジェクトです。");
                 MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
             }
 
-                if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
             {
                 Debug.Log("オブジェクトです");
                 switch (status)
                 {
                     case PlayerStatus.SummonCard:
+                        Debug.Break();
+                        SwitchPlayerNone();
+                        break;
                     case PlayerStatus.None:
                         AtachMassObject = hit.collider.gameObject;
-                        SwitchPlayerNone();
+                        if (NowPhase != PhaseMaster.Phase.Main1)
+                            SwitchPlayerNone();
+                        break;
 
                         break;
 
@@ -119,6 +154,10 @@ public class Player : MonoBehaviour
 
                     case PlayerStatus.ChoosingCard:
                         AtachMassObject = hit.collider.gameObject;
+                        if (PhaseMaster.Phase.Move == NowPhase)
+                        {
+                            break;
+                        }
                         AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
                         SummonCard();
                         break;
@@ -255,9 +294,10 @@ public class Player : MonoBehaviour
                         AtachCharObject.transform.position = MovePos;
                         MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                         MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                        MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+
                         AtachCharObject = null;
                         ret = false;
+
                         status = PlayerStatus.None;
                         break;
 
@@ -270,7 +310,6 @@ public class Player : MonoBehaviour
                         }
                         MasterObject.GetComponent<BoardMaster>().SetLoseObj(AtachCharObject, AtachMassNumber);
                         MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                        MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
                         AtachCharObject = null;
                         ret = false;
                         status = PlayerStatus.None;
@@ -288,13 +327,13 @@ public class Player : MonoBehaviour
                         AtachCharObject.transform.position = MovePos;
                         //MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                         MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                        MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
                         AtachCharObject = null;
                         status = PlayerStatus.None;
                         ret = false;
                         break;
 
                 }
+                MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
 
             }
             if (ret)//通常の移動の時
@@ -316,8 +355,7 @@ public class Player : MonoBehaviour
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                 AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
-                MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
-
+                MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
 
                 //                AtachCharObject.GetComponent<CharacterStatus>().SkillStart();
                 AllAtachNull();
@@ -429,6 +467,10 @@ public class Player : MonoBehaviour
 
         int DictionaryNum;
         Debug.Log("これはカードです");
+        if (NowPhase == PhaseMaster.Phase.Move)
+        {
+            return;
+        }
         int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
         RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
         SumonsCost = AtachDeckCardObj.GetComponent<IllustrationCard>().GetSumonCos();
@@ -484,5 +526,14 @@ public class Player : MonoBehaviour
         InstanceSumonObj.GetComponent<MoveData>().ReadSetObj(InstanceSumonObj);
         InstanceSumonObj.GetComponent<ReadCsv>().SetTargetObj(InstanceSumonObj);
         InstanceSumonObj.GetComponent<MoveData>().IniSet();
+    }
+    public GameObject GetAtachMassNum()
+    {
+        return AtachMassObject;
+    }
+
+    public void SetNowPhase(PhaseMaster.Phase phase)
+    {
+        NowPhase = phase;
     }
 }

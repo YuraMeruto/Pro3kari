@@ -59,9 +59,9 @@ public class MoveData : MonoBehaviour
     /// <param name="num"></param>
     public void IsPossibleMove(int num)
     {
-    
+
         MassNumber = num;
-       
+
         //自分がどこのますにいるかをけんさく
         for (int length = 0; length < MaxMassLength; length++)
         {
@@ -83,6 +83,7 @@ public class MoveData : MonoBehaviour
                         int playernum = ret.GetComponent<CharacterStatus>().GetPlayerNumber();
                         NowMyPosx = side;//自分のマスのポジションの各位置を記録
                         NowMyPosz = length;//自分のマスのポジションの各位置を記録
+
                         //                        if (retracenum == 1)
                         //                        {
                         //                            PornIsPossible();
@@ -106,7 +107,7 @@ public class MoveData : MonoBehaviour
     }
     public void InstanceIsPossibleMoveAreaInverted()//プレイヤー１の移動範囲の生成の仕方
     {
-        int KariZ = -MoveDataMaxLengthSize/2;
+        int KariZ = -MoveDataMaxLengthSize / 2;
         for (int length = MoveDataMaxLengthSize; length >= 0; length--)
         {
             int KariX = -MoveDataMaxSideSize / 2;
@@ -119,7 +120,7 @@ public class MoveData : MonoBehaviour
                     int resultx = NowMyPosx + KariX;
                     bool IsOut = true;
                     IsOut = OutSideTheArea(resultz, resultx);
-                
+
                     if (IsOut)
                     {
                         bool ret = true;
@@ -211,8 +212,8 @@ public class MoveData : MonoBehaviour
                                 ret = false;
                             }
                             int myrace = GetComponent<CharacterStatus>().GetRace();
-                            if(myrace == 1)
-                                {
+                            if (myrace == 1)
+                            {
                                 ret = false;
                             }
 
@@ -301,6 +302,16 @@ public class MoveData : MonoBehaviour
         ReadMoveData[0, 1] = 0;
     }
 
+
+    public int GetMaxLengthMove()
+    {
+        return MoveDataMaxLengthSize;
+    }
+
+    public int GetMaxSideMove()
+    {
+        return MoveDataMaxSideSize;
+    }
 
 }
 

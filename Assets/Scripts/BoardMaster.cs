@@ -8,7 +8,8 @@ public class BoardMaster : MonoBehaviour
 
     [SerializeField]
     private List<GameObject> CharacterList = new List<GameObject>();
-
+    private enum Phase {None,Main1,Move,Main2,TurnEnd };
+    private Phase phase = Phase.Main1;
     [SerializeField]
     private string FileName;
     private int[,] IntData = new int[10, 10];
@@ -60,6 +61,8 @@ public class BoardMaster : MonoBehaviour
     [SerializeField]
     private List<GameObject> AtTheStartSkillList = new List<GameObject>();
 
+    [SerializeField]
+    private int MoveCount = 2;
     // Use this for initialization
     void Start()
     {
@@ -749,6 +752,22 @@ public class BoardMaster : MonoBehaviour
     }
 
     public void CharacterTurnStartSkill()
+    {
+
+    }
+
+    public void MoveCountSubtraction()
+    {
+        MoveCount--;
+        if(MoveCount<=0)
+        {
+            GetComponent<PhaseMaster>().NextFase();
+            MoveCount = 2;
+        //    SetTurnPlayer();
+        }
+    }
+
+    public void SetStartAnimation()
     {
 
     }

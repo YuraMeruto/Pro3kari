@@ -22,7 +22,11 @@ public class CharacterStatus : MonoBehaviour
     private int SummonsCost;
 
     public SkillBase skill;
+    public GameObject skillobj;
     private bool IsFirstMove = true; //ポーン専用
+
+    private int NowLengthMass;
+    private int NowSidehMass;
     //Use this for initialization
     void Start()
     {
@@ -69,11 +73,6 @@ public class CharacterStatus : MonoBehaviour
     public void SetAttack(int attack)
     {
         CharcterAttack = attack;
-    }
-
-    public void SetRole()
-    {
-
     }
 
     public int GetRace()

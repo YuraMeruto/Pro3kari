@@ -37,4 +37,15 @@ public class PlayerTurn : MonoBehaviour {
     {
         GetComponent<Text>().color = Color.blue;
     }
+
+    public bool GetAnimation()
+    {
+ //       int anim = Animator.StringToHash("Up");
+        AnimatorStateInfo animinfo = GetComponent<Animator>().GetCurrentAnimatorStateInfo(0);
+        if(animinfo.normalizedTime<1.0f)
+        {
+            return true;
+        }
+        return false;
+    }
 }
