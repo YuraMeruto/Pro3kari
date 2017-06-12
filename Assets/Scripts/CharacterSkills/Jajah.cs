@@ -6,9 +6,11 @@ public class Jajah : SkillBase
 {
     [SerializeField]
     private int SkillCount = 1;
-
+    [SerializeField]
+    private GameObject SkillInstanceObj;
     [SerializeField]
     private GameObject Master;
+    private GameObject CameraObj;
     private GameObject Parent;
     [SerializeField]
     private GameObject PlayerObj;
@@ -16,14 +18,16 @@ public class Jajah : SkillBase
     {
         Parent = gameObject.transform.parent.gameObject;
        Master = GameObject.Find ("Master");
+        PlayerObj = GameObject.Find("Main Camera");
     }
     private int NowMyPosLength;
     private int NowMyPosSide;
     private int MaxLength;
     private int MaxSide;
-        
+    [SerializeField]
+    GameObject IsEnemyObj;
 
-    
+
     [SerializeField]
     private GameObject MoveAreaObj;
 
@@ -38,12 +42,12 @@ public class Jajah : SkillBase
     }
     public override void BattleStart()
     {
-        DestroySkill();
+ //       DestroySkill();
 
     }
     public override void BattleEnd()
     {
-        DestroySkill();
+  //      DestroySkill();
 
     }
 
@@ -54,8 +58,7 @@ public class Jajah : SkillBase
     }
     public override void MoveEnd()
     {
-        DestroySkill();
-
+       // DestroySkill();
     }
 
     public void DestroySkill()
@@ -83,16 +86,17 @@ public class Jajah : SkillBase
                     IsOut = OutSideTheArea(sumlength, sumside);
                     if (IsOut)
                     {
-                        GameObject IsEnemyObj = Master.GetComponent<BoardMaster>().GetCharObject(sumlength,sumside);
+                         IsEnemyObj = Master.GetComponent<BoardMaster>().GetCharObject(sumlength,sumside);
                         if(IsEnemyObj != null)
                         {
                             int IsEnemyPlayerNumber = IsEnemyObj.GetComponent<CharacterStatus>().GetPlayerNumber();
                             int MyNumber = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
                             if(IsEnemyPlayerNumber != MyNumber)
                             {
+                                Master.GetComponent<BoardList>().SetSkillList(IsEnemyObj);
                                 Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[sumlength,sumside].transform.position;
                                 InstancePos.z = 1.0f;
-                                GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
+                                GameObject IsMoveObj = Instantiate(SkillInstanceObj, InstancePos, Quaternion.identity) as GameObject;
                                 IsMoveObj.tag = "IsMovetag";
                                 Master.GetComponent<BoardMaster>().SetIsMove(sumlength,sumside, true);
                             }
@@ -104,9 +108,10 @@ public class Jajah : SkillBase
         }
         SkillCount--;
     }
+
     public void NowMyPos()
     {
-        GameObject Massobj = PlayerObj.GetComponent<Player>().GetAtachMassNum();
+        GameObject Massobj = PlayerObj.GetComponent<AtachMaster>().GetAttachMassObj();
         int Massnum = Massobj.GetComponent<NumberMass>().GetNumber();
         MaxLength = Parent.GetComponent<MoveData>().GetMaxLengthMove();
         MaxSide = Parent.GetComponent<MoveData>().GetMaxSideMove();

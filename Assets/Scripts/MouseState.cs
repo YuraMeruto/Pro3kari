@@ -7,6 +7,8 @@ public class MouseState : MonoBehaviour
     private GameObject MasterObject;
     private int RaceNum;
     private int SumonsCost;
+    [SerializeField]
+    GameObject IsEnemyObj;
     void Start()
     {
         MasterObject = GameObject.Find("Master");
@@ -79,7 +81,7 @@ public class MouseState : MonoBehaviour
         if (IsSamePlayerCharObj)
         {
             
-            GameObject IsEnemyObj = null;
+       //     GameObject IsEnemyObj = null;
             ret = MasterObject.GetComponent<BoardMaster>().GetIsMove(CopyAttachMassNumber);
             int AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
             IsEnemyObj = MasterObject.GetComponent<BoardMaster>().GetCharObject(CopyAttachMassNumber);//移動先が敵の駒があるのか確認
@@ -91,7 +93,13 @@ public class MouseState : MonoBehaviour
                 {
                     IsEnemyObj = null;
                 }
+                bool ISSkillTargetList = MasterObject.GetComponent<BoardList>().GetList(IsEnemyObj);
+                if(ISSkillTargetList)
+                {
+                    Debug.Log("リスト内にターゲットがいたぞ");
+                }
                 AtachCharObject.GetComponent<CharacterStatus>().skill.BattleStart();//戦闘が始まったときのキャラクターのスキルの処理
+                GetComponent<AtachMaster>().SetEnemyObj(IsEnemyObj);
                 var BattleRet = GetComponent<BattleScene>().Result();
                
                 switch (BattleRet)

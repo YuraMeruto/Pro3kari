@@ -37,7 +37,7 @@ public class AtachMaster : MonoBehaviour
     {
         CopyAttachMassObject = setobj;
     }
-    public void SetEnemyMassObj(GameObject setobj)
+    public void SetEnemyObj(GameObject setobj)
     {
         EnemyObjct = setobj;
     }

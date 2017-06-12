@@ -12,6 +12,8 @@ public class BattleScene : MonoBehaviour {
 
 public  BattleResult Result()
     {
+         GameObject AttachCharcterObject = GetComponent<AtachMaster>().GetAttachCharObj();
+        GameObject EnemyObject = GetComponent<AtachMaster>().GetAttachEnemyObj();
         int MyCharHp = AttachCharcterObject.GetComponent<CharacterStatus>().GetHp();
         int MyCharAttack = AttachCharcterObject.GetComponent<CharacterStatus>().GetAttack();
         int EnemyHp = EnemyObject.GetComponent<CharacterStatus>().GetHp();

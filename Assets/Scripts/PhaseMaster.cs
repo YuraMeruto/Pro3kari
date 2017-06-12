@@ -66,7 +66,18 @@ public class PhaseMaster : MonoBehaviour {
                 break;
         }
 
-        PlayerObj.GetComponent<Player>().SetNowPhase(phase);
+        // PlayerObj.GetComponent<Player>().SetNowPhase(phase);
+        SetNowPhase();
+    }
 
+    public void SetFase(Phase setphase)
+    {
+        phase = setphase;
+        SetNowPhase();
+    }
+
+    public void SetNowPhase()
+    {
+        PlayerObj.GetComponent<Player>().SetNowPhase(phase);
     }
 }

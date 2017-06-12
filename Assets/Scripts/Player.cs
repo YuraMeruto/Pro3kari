@@ -106,7 +106,7 @@ public class Player : MonoBehaviour
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, TurnObjLayer))
             {
                 Debug.Log("これはターン修了のオブジェクトです。");
-                MasterObject.GetComponent<BoardMaster>().SetTurnPlayer();
+                MasterObject.GetComponent<PhaseMaster>().SetFase(PhaseMaster.Phase.TurnEnd);
             }
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
@@ -121,7 +121,7 @@ public class Player : MonoBehaviour
                     case PlayerStatus.None:
 //                        AtachMassObject = hit.collider.gameObject;
                         GetComponent<AtachMaster>().SetAttachMassObject(hit.collider.gameObject);
-                        if (NowPhase != PhaseMaster.Phase.Main1)
+                        if (NowPhase != PhaseMaster.Phase.Main1 || NowPhase != PhaseMaster.Phase.Main2)
                             GetComponent<MouseState>().SwitchPlayerNone();
                         break;
 
