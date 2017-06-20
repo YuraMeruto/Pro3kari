@@ -17,7 +17,7 @@ public class Jajah : SkillBase
     void Start()
     {
         Parent = gameObject.transform.parent.gameObject;
-       Master = GameObject.Find ("Master");
+        Master = GameObject.Find("Master");
         PlayerObj = GameObject.Find("Main Camera");
     }
     private int NowMyPosLength;
@@ -31,6 +31,32 @@ public class Jajah : SkillBase
     [SerializeField]
     private GameObject MoveAreaObj;
 
+    public override bool Is_AtTheStart()
+    {
+        return false;
+    }
+    public override bool Is_AtTheEnd()
+    {
+        return false;
+    }
+    public override bool Is_BattleStart()
+    {
+        return true;
+    }
+
+    public override bool Is_BattleEnd()
+    {
+        return false;
+    }
+    public override bool Is_MoveStart()
+    {
+        return true;
+    }
+
+    public override bool Is_MoveEnd()
+    {
+        return false;
+    }
     public override void AtTheStart()
     {
         DestroySkill();
@@ -42,12 +68,12 @@ public class Jajah : SkillBase
     }
     public override void BattleStart()
     {
- //       DestroySkill();
+        DestroySkill();
 
     }
     public override void BattleEnd()
     {
-  //      DestroySkill();
+        //      DestroySkill();
 
     }
 
@@ -58,97 +84,110 @@ public class Jajah : SkillBase
     }
     public override void MoveEnd()
     {
-       // DestroySkill();
+        // DestroySkill();
     }
 
     public void DestroySkill()
     {
-        if(SkillCount <=0)
+        Debug.Log("ジャジャスキル発動");
+        if (SkillCount <= 0)
         {
             return;
         }
-        NowMyPos();
-        int MaxMoveDataLength = Parent.GetComponent<MoveData>().MoveDataMaxLengthSize;
-        int MaxMoveDataSide = Parent.GetComponent<MoveData>().MoveDataMaxSideSize;
-        int Kariz = -MaxMoveDataLength / 2;
-        for (int length = 0; length < MaxLength; length++)
+      GameObject  targetobj=  PlayerObj.GetComponent<AtachMaster>().GetAttachEnemyObj();
+        bool ret = Master.GetComponent<BoardList>().GetSkillTargetList(targetobj);
+        if(ret)
         {
-            int KariX = -MaxMoveDataSide / 2;
-            for (int side = 0; side < MaxSide; side++)
-            {
-                int num = Parent.GetComponent<MoveData>().GetReadMoveData(length, side);
-
-                if (num == 3)
+            Destroy(targetobj);
+            PlayerObj.GetComponent<MouseState>().SetIsTargetBool(true);
+            Master.GetComponent<BoardList>().ClearSkillTargetList();
+        }
+        /*
+                NowMyPos();
+                int MaxMoveDataLength = Parent.GetComponent<MoveData>().MoveDataMaxLengthSize;
+                int MaxMoveDataSide = Parent.GetComponent<MoveData>().MoveDataMaxSideSize;
+                int Kariz = -MaxMoveDataLength / 2;
+                for (int length = 0; length < MaxLength; length++)
                 {
-                    int sumlength = NowMyPosLength + Kariz;
-                    int sumside = NowMyPosSide + KariX;
-                    bool IsOut = true;
-                    IsOut = OutSideTheArea(sumlength, sumside);
-                    if (IsOut)
+                    int KariX = -MaxMoveDataSide / 2;
+                    for (int side = 0; side < MaxSide; side++)
                     {
-                         IsEnemyObj = Master.GetComponent<BoardMaster>().GetCharObject(sumlength,sumside);
-                        if(IsEnemyObj != null)
+                        int num = Parent.GetComponent<MoveData>().GetReadMoveData(length, side);
+
+                        if (num == 3)
                         {
-                            int IsEnemyPlayerNumber = IsEnemyObj.GetComponent<CharacterStatus>().GetPlayerNumber();
-                            int MyNumber = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
-                            if(IsEnemyPlayerNumber != MyNumber)
+                            int sumlength = NowMyPosLength + Kariz;
+                            int sumside = NowMyPosSide + KariX;
+                            bool IsOut = true;
+                            IsOut = OutSideTheArea(sumlength, sumside);
+                            if (IsOut)
                             {
-                                Master.GetComponent<BoardList>().SetSkillList(IsEnemyObj);
-                                Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[sumlength,sumside].transform.position;
-                                InstancePos.z = 1.0f;
-                                GameObject IsMoveObj = Instantiate(SkillInstanceObj, InstancePos, Quaternion.identity) as GameObject;
-                                IsMoveObj.tag = "IsMovetag";
-                                Master.GetComponent<BoardMaster>().SetIsMove(sumlength,sumside, true);
+                                 IsEnemyObj = Master.GetComponent<BoardMaster>().GetCharObject(sumlength,sumside);
+                                if(IsEnemyObj != null)
+                                {
+                                    int IsEnemyPlayerNumber = IsEnemyObj.GetComponent<CharacterStatus>().GetPlayerNumber();
+                                    int MyNumber = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
+                                    if(IsEnemyPlayerNumber != MyNumber)
+                                    {
+                                        Master.GetComponent<BoardList>().SetSkillList(IsEnemyObj);
+                                        Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[sumlength,sumside].transform.position;
+                                        InstancePos.z = 1.0f;
+                                        GameObject IsMoveObj = Instantiate(SkillInstanceObj, InstancePos, Quaternion.identity) as GameObject;
+                                        IsMoveObj.tag = "IsMovetag";
+                                        Master.GetComponent<BoardMaster>().SetIsMove(sumlength,sumside, true);
+                                    }
+                                }
                             }
                         }
+
+                    }
+                }
+                SkillCount--;
+            }
+
+            public void NowMyPos()
+            {
+                GameObject Massobj = PlayerObj.GetComponent<AtachMaster>().GetAttachMassObj();
+                int Massnum = Massobj.GetComponent<NumberMass>().GetNumber();
+                MaxLength = Parent.GetComponent<MoveData>().GetMaxLengthMove();
+                MaxSide = Parent.GetComponent<MoveData>().GetMaxSideMove();
+                int num;
+                //        int KariZ = 
+                for (int length = 0; length < MaxLength; length++)
+                {
+                    for (int side = 0; side < MaxSide; side++)
+                    {
+                        if (Master.GetComponent<BoardMaster>().MassNum[length, side] == Massnum)
+                        {
+                            NowMyPosLength = length;
+                            NowMyPosSide = side;
+                            break;
+                        }
+
                     }
                 }
 
             }
-        }
-        SkillCount--;
-    }
 
-    public void NowMyPos()
-    {
-        GameObject Massobj = PlayerObj.GetComponent<AtachMaster>().GetAttachMassObj();
-        int Massnum = Massobj.GetComponent<NumberMass>().GetNumber();
-        MaxLength = Parent.GetComponent<MoveData>().GetMaxLengthMove();
-        MaxSide = Parent.GetComponent<MoveData>().GetMaxSideMove();
-        int num;
-        //        int KariZ = 
-        for (int length = 0; length < MaxLength; length++)
-        {
-            for (int side = 0; side < MaxSide; side++)
+            public bool OutSideTheArea(int InstanceLength, int InstanceSide)//マス外であるかの判定
             {
-                if (Master.GetComponent<BoardMaster>().MassNum[length, side] == Massnum)
+                bool ret = true;
+                int MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
+                int MaxMassSide = Master.GetComponent<BoardMaster>().GetMaxSide();
+                if (InstanceLength >= MaxMassLength || InstanceSide >= MaxMassSide)
                 {
-                    NowMyPosLength = length;
-                    NowMyPosSide = side;
-                    break;
+                    ret = false;
                 }
 
+                else if (InstanceLength < 0 || InstanceSide < 0)
+                {
+                    ret = false;
+                }
+                return ret;
             }
-        }
+            */
+
+
 
     }
-
-    public bool OutSideTheArea(int InstanceLength, int InstanceSide)//マス外であるかの判定
-    {
-        bool ret = true;
-        int MaxMassLength = Master.GetComponent<BoardMaster>().GetMaxLength();
-        int MaxMassSide = Master.GetComponent<BoardMaster>().GetMaxSide();
-        if (InstanceLength >= MaxMassLength || InstanceSide >= MaxMassSide)
-        {
-            ret = false;
-        }
-
-        else if (InstanceLength < 0 || InstanceSide < 0)
-        {
-            ret = false;
-        }
-        return ret;
-    }
-
-
 }

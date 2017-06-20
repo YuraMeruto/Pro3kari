@@ -28,9 +28,12 @@ public class MoveData : MonoBehaviour
     private GameObject ReadObj;//Readcsvを呼び出すため仮でやっています。
     [SerializeField]
     private string FileName;
+    private GameObject MainCameraObj;
 
+    
     public void IniSet()
     {
+        MainCameraObj = GameObject.Find("Main Camera");
         Master = GameObject.Find("Master");
         ReadObj.GetComponent<ReadCsv>().SetFileName(this.gameObject, FileName);
         //MoveDataMaxLengthSize = ReadObj.GetComponent<ReadCsv>().MaxLengthSize;
@@ -163,6 +166,7 @@ public class MoveData : MonoBehaviour
                             int MyNumber = this.gameObject.GetComponent<CharacterStatus>().GetPlayerNumber();
                             if (MyNumber != IsCharNumber)
                             {
+                                Master.GetComponent<BoardList>().SetSkillTargetList(IsCharObj);
                                 Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
                                 InstancePos.z = 1.0f;
                                 GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;

@@ -374,6 +374,7 @@ public class BoardMaster : MonoBehaviour
         GetComponent<SkillsMaster>().EndSkills();//登録されているキャラクターのスキル発動
         PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();//ターンが変わる前にいったん全部消す
         AllSPObjDestroy();
+        TurnEnd();
         switch (TurnPlayer)
         {
             case 1:
@@ -700,28 +701,13 @@ public class BoardMaster : MonoBehaviour
     {
         SubtractionSummoningSicknessCharacterList();
     }
-    public void PornIsPossible()
-    {
-
-    }
+  
     public void SPDestroyCall()
     {
         PlayerObj[TurnPlayer].GetComponent<SP>().DestroyList(CopyCost);
     }
 
-    public void DebugObj()
-    {
-        for (int length = 0; length < 10; length++)
-        {
-            for (int size = 0; size < 10; size++)
-            {
-                if (CharObj[length,size] !=null)
-                {
-                    Instantiate(Kari,CharObj[length,size].transform.position,Quaternion.identity);
-                }
-            }
-        }
-    }
+   
 
     public void CharacterTurnStartSkill()
     {
@@ -739,6 +725,10 @@ public class BoardMaster : MonoBehaviour
         }
     }
 
+    void TurnEnd()
+    {
+        GetComponent<BoardList>().ClearMoveList();
+    }
     public void SetStartAnimation()
     {
 

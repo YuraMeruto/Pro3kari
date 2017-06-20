@@ -97,7 +97,6 @@ public class ReadCsv : MonoBehaviour
         int copyx = 0;
         int copyz = 0;
         StreamReader sr = new StreamReader(Application.dataPath + "/" + FileName + ".csv", Encoding.GetEncoding("Shift_JIS"));
-        Debug.Log(Application.dataPath);
 
         while (sr.Peek() >= 0)
         {

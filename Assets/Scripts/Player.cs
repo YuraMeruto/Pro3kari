@@ -21,8 +21,8 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
+    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate ,SkillChoosing};
     [SerializeField]
-    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate };
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
     private int PlayerNumber;
@@ -47,6 +47,13 @@ public class Player : MonoBehaviour
     private PhaseMaster.Phase NowPhase;
     [SerializeField]
     private LayerMask NextPhaseLayer;
+    [SerializeField]
+    private GameObject YesObj;
+    [SerializeField]
+    private GameObject NoObj;
+
+    private bool IsSkillSwitch = false;
+    private float SkillSwitchTime = 0;
     // Use this for initialization
     void Start()
     {
@@ -60,10 +67,11 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))//デバック用操作
         {
-            MasterObject.GetComponent<BoardMaster>().DebugObj();
+     //       MasterObject.GetComponent<BoardMaster>().DebugObj();
         }
 
         MauseMove();
+        IsSkillSwitchAdd();
     }
     void MauseRay()
     {
@@ -103,13 +111,28 @@ public class Player : MonoBehaviour
                 NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
             }
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, TurnObjLayer))
+            else if(Physics.Raycast(ray,out hit,Mathf.Infinity,YesLayer))
+            {
+                Debug.Log("これはYesのオブジェクトです");
+                GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.Yes);
+                SetActiveYesNoObjFalse();
+                GetComponent<SkillState>().SkillActive();
+            }
+
+            else if (Physics.Raycast(ray, out hit, Mathf.Infinity, NoLayer))
+            {
+                Debug.Log("これはNoのオブジェクトです");
+                GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.No);
+                SetActiveYesNoObjFalse();
+            }
+
+            else if (Physics.Raycast(ray, out hit, Mathf.Infinity, TurnObjLayer))
             {
                 Debug.Log("これはターン修了のオブジェクトです。");
                 MasterObject.GetComponent<PhaseMaster>().SetFase(PhaseMaster.Phase.TurnEnd);
             }
 
-            if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
+            else if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
             {
                 Debug.Log("オブジェクトです");
                 switch (status)
@@ -178,6 +201,26 @@ public class Player : MonoBehaviour
                         break;
                 }
             }
+            IsSkillSwitch = true;
+        }
+        else if(Input.GetMouseButtonUp(0))
+        {
+            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+
+            RaycastHit hit;
+
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
+            {
+                switch (status)
+                {
+                        case PlayerStatus.Choose:
+                        //                        CopyAtachMassObject = hit.collider.gameObject;
+                        GetComponent<AtachMaster>().SetCopyAttachMassObj(hit.collider.gameObject);
+                        GetComponent<MouseState>().SwitchPlayerChoose();
+                        break;
+                }
+            }
+
         }
     }
 
@@ -197,11 +240,37 @@ public class Player : MonoBehaviour
     }
 
 
+    public void SetActiveYesNoObjTrue()
+    {
+        YesObj.SetActive(true);
+        NoObj.SetActive(true);
+        status = PlayerStatus.None;
+    }
 
+    public void SetActiveYesNoObjFalse()
+    {
+        YesObj.SetActive(false);
+        NoObj.SetActive(false);
+    }
 
-
-
-
+    void IsSkillSwitchAdd()
+    {
+        if(IsSkillSwitch)
+        {
+            SkillSwitchTime += Time.deltaTime;
+        }
+    }
+public    void IsSkillZyazi()
+    {
+        IsSkillSwitch = false;
+        if(SkillSwitchTime<2)
+        {
+            Debug.Log("成功!!!");
+            GameObject atachobj = GetComponent<AtachMaster>().GetAttachCharObj();
+            atachobj.GetComponent<CharacterStatus>().SetIsSkill();
+        }
+        SkillSwitchTime = 0;
+    }
     /*
     void SwitchPlayerNone()//何も選択していない状態でキャラクターを選択した時
     {

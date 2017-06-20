@@ -24,7 +24,9 @@ public class CharacterStatus : MonoBehaviour
     public SkillBase skill;
     public GameObject skillobj;
     private bool IsFirstMove = true; //ポーン専用
-
+    [SerializeField]
+    private bool IsSkill = false;
+//    private 
     private int NowLengthMass;
     private int NowSidehMass;
     //Use this for initialization
@@ -99,5 +101,20 @@ public class CharacterStatus : MonoBehaviour
     {
         IsFirstMove = false;
         GetComponent<MoveData>().SetMoveData();
+    }
+
+    public void SetIsSkill(bool set)
+    {
+        IsSkill = set;
+    }
+
+    public void SetIsSkill()
+    {
+        IsSkill = !IsSkill;
+    }
+
+    public bool GetIsSkill()
+    {
+        return IsSkill;
     }
 }
