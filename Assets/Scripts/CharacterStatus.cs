@@ -20,19 +20,20 @@ public class CharacterStatus : MonoBehaviour
     private int SummoningSickness =0;
     [SerializeField]
     private int SummonsCost;
-
     public SkillBase skill;
     public GameObject skillobj;
     private bool IsFirstMove = true; //ポーン専用
     [SerializeField]
     private bool IsSkill = false;
-//    private 
     private int NowLengthMass;
     private int NowSidehMass;
+    private int MaxHp;
+    [SerializeField]
+    private GameObject ParticleObj;
     //Use this for initialization
     void Start()
     {
-
+        MaxHp = CharcterHp;
         Master = GameObject.Find("Master");
         for (int x = 0; x < 10; x++)
         {
@@ -116,5 +117,28 @@ public class CharacterStatus : MonoBehaviour
     public bool GetIsSkill()
     {
         return IsSkill;
+    }
+
+    public void SetIsActiveSkillParticle(bool _set)
+    {
+        ParticleObj.SetActive(_set);
+    }
+    public void SetReCovery(int recoverynum)
+    {
+        
+    }
+
+    public void SetAttackAdd(int Addnum)
+    {
+        CharcterAttack += Addnum;
+    }
+
+    public void SetHpAdd(int Addnum)
+    {
+        CharcterHp += Addnum;
+        if(MaxHp<=CharcterHp)
+        {
+            CharcterHp = MaxHp;
+        }
     }
 }

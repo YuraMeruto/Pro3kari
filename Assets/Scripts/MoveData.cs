@@ -8,7 +8,7 @@ public class MoveData : MonoBehaviour
     GameObject MoveAreaObj;
     [SerializeField]
     GameObject Master;
-    private int[,] ReadMoveData = new int[10, 10];//読み込まれた
+    private int[,] ReadMoveData = new int[18, 18];//読み込まれた
 
     private int CSVMyPositionX;    //読み込んだデータの自分のポジション
     private int CSVMyPositionZ;    //読み込んだデータの自分のポジション
@@ -45,7 +45,7 @@ public class MoveData : MonoBehaviour
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
                 ReadMoveData[z, x] = ReadObj.GetComponent<ReadCsv>().InputMoveData(z, x);
-                //                Debug.Log(ReadMoveData[z, x]);
+                Debug.Log(ReadMoveData[z, x]);
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X
@@ -123,7 +123,6 @@ public class MoveData : MonoBehaviour
                     int resultx = NowMyPosx + KariX;
                     bool IsOut = true;
                     IsOut = OutSideTheArea(resultz, resultx);
-
                     if (IsOut)
                     {
                         bool ret = true;

@@ -10,8 +10,8 @@ public class MouseState : MonoBehaviour
     [SerializeField]
     GameObject IsEnemyObj;
     private bool IsTargetBool = false;
-    public enum SkillActivate {Choosing,Yes,No,None}
-    public enum SkillActivateGo { AtTheStart, AtTheEnd, MoveStart, MoveEnd,BattleStart,BattleEnd,None, }
+    public enum SkillActivate { Choosing, Yes, No, None }
+    public enum SkillActivateGo { AtTheStart, AtTheEnd, MoveStart, MoveEnd, BattleStart, BattleEnd, None, }
     public SkillActivateGo skillgo;
     [SerializeField]
     private SkillActivate skillactive = SkillActivate.None;
@@ -106,11 +106,7 @@ public class MouseState : MonoBehaviour
                     IsEnemyObj = null;
                 }
                 GetComponent<AtachMaster>().SetEnemyObj(IsEnemyObj);
-               bool IsSkillret = AtachCharObject.GetComponent<CharacterStatus>().GetIsSkill();
-                if(IsSkillret)
-                {
-                    AtachCharObject.GetComponent<CharacterStatus>().skill.Is_AtTheStart();
-                }
+              
                 if (!IsTargetBool)
                 {
                     var BattleRet = GetComponent<BattleScene>().Result();
@@ -130,7 +126,7 @@ public class MouseState : MonoBehaviour
                             AtachCharObject.transform.position = MovePos;
                             MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                             MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                            BattleEnd();
+                            AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();
                             AtachCharObject = null;
                             ret = false;
 
@@ -165,11 +161,16 @@ public class MouseState : MonoBehaviour
                             AtachCharObject.transform.position = MovePos;
                             //MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                             MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                            BattleEnd();
+                            Debug.Log("cococococ");
+                            Debug.Log(AtachCharObject+"aaaaaaa");
+                            AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();
                             AtachCharObject = null;
                             //                        status = PlayerStatus.None;
                             GetComponent<Player>().SetState(Player.PlayerStatus.None);
                             ret = false;
+                            break;
+
+                        case BattleScene.BattleResult.None:
                             break;
                     }
                 }
@@ -178,7 +179,9 @@ public class MouseState : MonoBehaviour
             }
             if (ret)//通常の移動の時
             {
+
                 Debug.Log("通常移動");
+                AtachCharObject.GetComponent<CharacterStatus>().skill.MoveStart();
                 MasterObject.GetComponent<BoardList>().SetMoveList(AtachCharObject);
                 AllIsMoveAreaDestroy();
                 AllSummonsCardDestroy();
@@ -195,22 +198,19 @@ public class MouseState : MonoBehaviour
                 }
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                bool isskillret = AtachCharObject.GetComponent<CharacterStatus>().GetIsSkill();
-                if (isskillret) {
-                    AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
-                    return;
-                }
-                
+
+                AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
                 MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
 
                 //                AtachCharObject.GetComponent<CharacterStatus>().SkillStart();
                 AllAtachNull();
-                GetComponent<Player>().SetState(Player.PlayerStatus.None);
+                GetComponent<Player>().SetState(Player.PlayerStatus.None);/*
                 bool IsSkillret = AtachCharObject.GetComponent<CharacterStatus>().GetIsSkill();
                 if (IsSkillret)
                 {
                     AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//戦闘が始まったときのキャラクターのスキルの処理
                 }
+                */
             }
         }
         AllAtachNull();
@@ -341,14 +341,10 @@ public class MouseState : MonoBehaviour
         InstanceSumonObj.GetComponent<MoveData>().ReadSetObj(InstanceSumonObj);
         InstanceSumonObj.GetComponent<ReadCsv>().SetTargetObj(InstanceSumonObj);
         InstanceSumonObj.GetComponent<MoveData>().IniSet();
+        MasterObject.GetComponent<BoardMaster>().SetSummonCharacters(InstanceSumonObj);
         GetComponent<AtachMaster>().SetInstanceSumonObj(InstanceSumonObj);
     }
 
-    public void BattleEnd()
-    {
-        GameObject AtachCharObject = GetComponent<AtachMaster>().GetAttachCharObj();
-        AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();//戦闘が始まったときのキャラクターのスキルの処理
-    }
     public void SetIsTargetBool(bool set)
     {
         IsTargetBool = set;
@@ -364,13 +360,9 @@ public class MouseState : MonoBehaviour
         GameObject AtachCharObject = GetComponent<AtachMaster>().GetAttachCharObj();
         if (skillactive == SkillActivate.None)
         {
-            bool skillret = AtachCharObject.GetComponent<CharacterStatus>().skill.Is_BattleStart();//スキルが使えるかどうか聞く
-            if (skillret)//使えるなら
-            {
-                GetComponent<Player>().SetState(Player.PlayerStatus.SkillChoosing);
-                skillactive = SkillActivate.Choosing;
-                return false;
-            }
+            GetComponent<Player>().SetState(Player.PlayerStatus.SkillChoosing);
+            skillactive = SkillActivate.Choosing;
+            return false;
         }
         switch (skillactive)
         {

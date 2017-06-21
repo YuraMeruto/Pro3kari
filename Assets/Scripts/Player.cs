@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate ,SkillChoosing};
+    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing };
     [SerializeField]
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
@@ -67,7 +67,7 @@ public class Player : MonoBehaviour
 
         if (Input.GetKeyDown(KeyCode.S))//デバック用操作
         {
-     //       MasterObject.GetComponent<BoardMaster>().DebugObj();
+            //       MasterObject.GetComponent<BoardMaster>().DebugObj();
         }
 
         MauseMove();
@@ -111,7 +111,7 @@ public class Player : MonoBehaviour
                 NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
             }
 
-            else if(Physics.Raycast(ray,out hit,Mathf.Infinity,YesLayer))
+            else if (Physics.Raycast(ray, out hit, Mathf.Infinity, YesLayer))
             {
                 Debug.Log("これはYesのオブジェクトです");
                 GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.Yes);
@@ -138,26 +138,25 @@ public class Player : MonoBehaviour
                 switch (status)
                 {
                     case PlayerStatus.SummonCard:
-                        Debug.Break();
                         GetComponent<MouseState>().SwitchPlayerNone();
                         break;
                     case PlayerStatus.None:
-//                        AtachMassObject = hit.collider.gameObject;
+                        //                        AtachMassObject = hit.collider.gameObject;
                         GetComponent<AtachMaster>().SetAttachMassObject(hit.collider.gameObject);
                         if (NowPhase != PhaseMaster.Phase.Main1 || NowPhase != PhaseMaster.Phase.Main2)
                             GetComponent<MouseState>().SwitchPlayerNone();
                         break;
 
-                        break;
+
 
                     case PlayerStatus.Choose:
-//                        CopyAtachMassObject = hit.collider.gameObject;
+                        //                        CopyAtachMassObject = hit.collider.gameObject;
                         GetComponent<AtachMaster>().SetCopyAttachMassObj(hit.collider.gameObject);
                         GetComponent<MouseState>().SwitchPlayerChoose();
                         break;
 
                     case PlayerStatus.ChoosingCard:
-                      //  AtachMassObject = hit.collider.gameObject;
+                        //  AtachMassObject = hit.collider.gameObject;
                         GetComponent<AtachMaster>().SetAttachMassObject(hit.collider.gameObject);
                         if (PhaseMaster.Phase.Move == NowPhase)
                         {
@@ -178,7 +177,7 @@ public class Player : MonoBehaviour
                     case PlayerStatus.ChoosingCard:
                     case PlayerStatus.ShowCard:
                     case PlayerStatus.None:
-//                        AtachDeckObj = hit2.collider.gameObject;
+                        //                        AtachDeckObj = hit2.collider.gameObject;
                         GetComponent<AtachMaster>().SetAttachDeckObj(hit2.collider.gameObject);
                         GetComponent<MouseState>().SwitchDeck();
 
@@ -194,7 +193,7 @@ public class Player : MonoBehaviour
                 switch (status)
                 {
                     case PlayerStatus.ShowCard:
-                      //  AtachDeckCardObj = hit2d.collider.gameObject;
+                        //  AtachDeckCardObj = hit2d.collider.gameObject;
                         GetComponent<AtachMaster>().SetAttachDeckCardObj(hit2d.collider.gameObject);
                         GetComponent<MouseState>().ChoosingCard();
                         status = PlayerStatus.ChoosingCard;
@@ -203,7 +202,7 @@ public class Player : MonoBehaviour
             }
             IsSkillSwitch = true;
         }
-        else if(Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0))
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -213,9 +212,15 @@ public class Player : MonoBehaviour
             {
                 switch (status)
                 {
-                        case PlayerStatus.Choose:
+                    case PlayerStatus.Choose:
                         //                        CopyAtachMassObject = hit.collider.gameObject;
                         GetComponent<AtachMaster>().SetCopyAttachMassObj(hit.collider.gameObject);
+                        if (NowPhase != PhaseMaster.Phase.Move)
+                        {
+                            AllIsMoveAreaDestroy();
+                            status = PlayerStatus.None;
+                            return;
+                        }
                         GetComponent<MouseState>().SwitchPlayerChoose();
                         break;
                 }
@@ -255,22 +260,48 @@ public class Player : MonoBehaviour
 
     void IsSkillSwitchAdd()
     {
-        if(IsSkillSwitch)
+        if (IsSkillSwitch)
         {
             SkillSwitchTime += Time.deltaTime;
         }
     }
-public    void IsSkillZyazi()
+
+    public void IsSkillZyazi()
     {
-        IsSkillSwitch = false;
-        if(SkillSwitchTime<2)
+        GameObject atachobj = GetComponent<AtachMaster>().GetAttachCharObj();
+        //       GameObject particleobj = atachobj.transform.FindChild("SkillParticl").gameObject;
+        if (SkillSwitchTime < 1)
         {
-            Debug.Log("成功!!!");
-            GameObject atachobj = GetComponent<AtachMaster>().GetAttachCharObj();
-            atachobj.GetComponent<CharacterStatus>().SetIsSkill();
+            atachobj.GetComponent<CharacterStatus>().SetIsSkill(true);
+            Debug.Log("スキルオン!!!");
+            //particleobj.SetActive(true);
+            atachobj.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(true);
+            SkillSwitchTime = 0;
+            IsSkillSwitch = true;
+            return;
         }
-        SkillSwitchTime = 0;
+
+        else
+        {
+            Debug.Log("スキルオフ!!!");
+            atachobj.GetComponent<CharacterStatus>().SetIsSkill(false);
+            atachobj.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(false);
+            //            particleobj.SetActive(false);
+            IsSkillSwitch = false;
+            SkillSwitchTime = 0;
+            return;
+        }
     }
+
+    void AllIsMoveAreaDestroy()//移動範囲の表示のオブジェクトをすべて消す
+    {
+        var clones = GameObject.FindGameObjectsWithTag("IsMovetag");
+        foreach (var clone in clones)
+        {
+            Destroy(clone);
+        }
+    }
+
     /*
     void SwitchPlayerNone()//何も選択していない状態でキャラクターを選択した時
     {
@@ -428,14 +459,6 @@ public    void IsSkillZyazi()
             }
         }
         AllAtachNull();
-    }
-    void AllIsMoveAreaDestroy()//移動範囲の表示のオブジェクトをすべて消す
-    {
-        var clones = GameObject.FindGameObjectsWithTag("IsMovetag");
-        foreach (var clone in clones)
-        {
-            Destroy(clone);
-        }
     }
     void AllSummonsCardDestroy()//移動範囲の表示のオブジェクトをすべて消す
     {

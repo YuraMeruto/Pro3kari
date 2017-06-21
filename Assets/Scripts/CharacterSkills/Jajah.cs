@@ -31,32 +31,25 @@ public class Jajah : SkillBase
     [SerializeField]
     private GameObject MoveAreaObj;
 
-    public override bool Is_AtTheStart()
+    public override void MyTurnStart()
     {
-        return false;
-    }
-    public override bool Is_AtTheEnd()
-    {
-        return false;
-    }
-    public override bool Is_BattleStart()
-    {
-        return true;
+
     }
 
-    public override bool Is_BattleEnd()
+    public override void MyTurnEnd()
     {
-        return false;
-    }
-    public override bool Is_MoveStart()
-    {
-        return true;
+
     }
 
-    public override bool Is_MoveEnd()
+    public override void EnemyTurnStart()
     {
-        return false;
     }
+
+    public override void EnemyTurnEnd()
+    {
+
+    }
+
     public override void AtTheStart()
     {
         DestroySkill();
@@ -89,18 +82,27 @@ public class Jajah : SkillBase
 
     public void DestroySkill()
     {
-        Debug.Log("ジャジャスキル発動");
-        if (SkillCount <= 0)
+        bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();
+        if (!IsGetSkill)
         {
             return;
         }
-      GameObject  targetobj=  PlayerObj.GetComponent<AtachMaster>().GetAttachEnemyObj();
-        bool ret = Master.GetComponent<BoardList>().GetSkillTargetList(targetobj);
-        if(ret)
+        Debug.Log("ジャジャスキル発動");
+        if (SkillCount <= 0)
         {
+            Debug.Log("スキルが発動できません");
+            return;
+        }
+      GameObject  targetobj=  PlayerObj.GetComponent<AtachMaster>().GetAttachEnemyObj();
+       // bool ret = Master.GetComponent<BoardList>().GetSkillTargetList(targetobj);
+//        Debug.Log("retの結果は"+ret);
+        if(targetobj != null)
+        {
+            Debug.Log("ターゲットを消滅させた");
             Destroy(targetobj);
             PlayerObj.GetComponent<MouseState>().SetIsTargetBool(true);
             Master.GetComponent<BoardList>().ClearSkillTargetList();
+            PlayerObj.GetComponent<BattleScene>().SetIsBattleStart(false);
         }
         /*
                 NowMyPos();

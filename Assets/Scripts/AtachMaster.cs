@@ -26,6 +26,8 @@ public class AtachMaster : MonoBehaviour
     private GameObject AtachDeckCardObj;
     [SerializeField]
     private GameObject ChoosingCardSummonObj;
+    [SerializeField]
+    private int Damage =100;
     private int AttachMassNumber;
     public void SetAttachMassObject(GameObject setobj)
     {
@@ -69,6 +71,14 @@ public class AtachMaster : MonoBehaviour
     {
         ChoosingCardObject = setobj;
     }
+
+    public void SetDamage(int setdamage)
+    {
+        Damage = setdamage;
+    }
+
+
+    //Get関係
     public GameObject GetAttachMassObj()
     {
         return AttachMassObject;
@@ -117,5 +127,10 @@ public class AtachMaster : MonoBehaviour
     public GameObject GetChoosingCardSummonObj()
     {
         return ChoosingCardObject;
+    }
+
+    public int GetDamage()
+    {
+        return Damage;
     }
 }

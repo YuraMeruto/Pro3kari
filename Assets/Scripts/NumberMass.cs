@@ -10,7 +10,8 @@ public class NumberMass : MonoBehaviour
     private bool IsPossibleMoveArea = false;
     public enum Status { None, OK, NG }
     public Status status = Status.None;
-
+    [SerializeField]
+    private int PlayerNumber;
     public void SetNumber(int num)
     {
         Number = num;
@@ -49,5 +50,15 @@ public class NumberMass : MonoBehaviour
     public void SettrueIsPossibleMoveArea()
     {
         IsPossibleMoveArea = true;
+    }
+
+    public void SetPlayerNumber(int set)
+    {
+        PlayerNumber = set;
+    }
+
+    public int GetPlayerNumber()
+    {
+        return PlayerNumber;
     }
 }

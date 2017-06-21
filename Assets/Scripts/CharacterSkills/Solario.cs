@@ -32,33 +32,24 @@ public class Solario : SkillBase
     [SerializeField]
     private GameObject MoveAreaObj;
 
-    public override bool Is_AtTheStart()
+    public override void MyTurnStart()
     {
-        return false;
-    }
-    public override bool Is_AtTheEnd()
-    {
-        return true;
-    }
-    public override bool Is_BattleStart()
-    {
-        return false;
+
     }
 
-    public override bool Is_BattleEnd()
+    public override void MyTurnEnd()
     {
-        return true;
-    }
-    public override bool Is_MoveStart()
-    {
-        return false;
+
     }
 
-    public override bool Is_MoveEnd()
+    public override void EnemyTurnStart()
     {
-        return true;
     }
 
+    public override void EnemyTurnEnd()
+    {
+
+    }
     public override void AtTheStart()
     {
 
@@ -94,17 +85,20 @@ public class Solario : SkillBase
 
     public void RecoveryMoveSkill()
     {
+        bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();
+        if (!IsGetSkill)
+        {
+            return;
+        }
         MouseState.SkillActivate retactive = PlayerObj.GetComponent<MouseState>().GetSkillActive();
-        switch(retactive)
+        if (SkillCount <= 0)
+            return;
+        
+        switch (retactive)
         {
             case MouseState.SkillActivate.Yes:
                 Debug.Log("ソラリオスキル発動");
-                Debug.Log(Parent);
-                if (SkillCount <= 0)
-                {
-                    return;
-                }
-
+                Parent.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(false);
                 Master.GetComponent<BoardList>().RemoveMoveList(Parent);
                 SkillCount--;
                 Parent.GetComponent<CharacterStatus>().SetIsSkill(false);

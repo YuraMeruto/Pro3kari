@@ -6,7 +6,7 @@ public class ReadCsv : MonoBehaviour
 {
     [SerializeField]
     private string FileName;
-    private int[,] IntData = new int[10, 10];
+    private int[,] IntData = new int[18, 18];
     [SerializeField]
     public int MaxSideSize;
     [SerializeField]
@@ -105,7 +105,6 @@ public class ReadCsv : MonoBehaviour
             foreach (string col in cols)
             {
                 IntData[countz, countx] = int.Parse(col);
-
                 TargetObj.GetComponent<ReadCsv>().SetData(countz, countx, int.Parse(col));
                 int a = TargetObj.GetComponent<ReadCsv>().InputMoveData(countz, countx);
                 countx++;

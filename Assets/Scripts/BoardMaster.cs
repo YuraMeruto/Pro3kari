@@ -36,6 +36,9 @@ public class BoardMaster : MonoBehaviour
     private GameObject PlayerTurnUI;
     [SerializeField]
     private List<GameObject> SummoningSicknessCharacterList = new List<GameObject>();
+
+    [SerializeField]
+    private List<GameObject> SumonCharacters = new List<GameObject>();
     //マスのオブジェクト
     [SerializeField]
     private GameObject[] ObjMass = new GameObject[2];
@@ -559,15 +562,6 @@ public class BoardMaster : MonoBehaviour
                 }
             }
         }
-        /*
-        if (MassArea[1, 0] == 1)
-        {
-            Vector3 Pospos = MassObj[1, 0].transform.position;
-            Pospos.z += 1;
-            Instantiate(Kari, Pospos, Quaternion.identity);
-        }
-        Debug.Log(MassObj[0, 1]);
-        */
     }
 
     /// <summary>
@@ -579,40 +573,9 @@ public class BoardMaster : MonoBehaviour
     public void SetSummonsPosData(int num, int length, int side)
     {
         FieldSummonData[side, length] = num;
-        /*
-        if (num == 1 && MassArea[side,length] == 1)
-        {
-            Vector3 Pos = MassObj[side,length].transform.position;
-            Pos.z += 1;
-            Instantiate(Kari, Pos, Quaternion.identity);
-        }
-        */
+
     }
 
-
-    public void DebugInst()
-    {
-        //Vector3 Pospos = MassObj[1, 0].transform.position;
-        //Pospos.z += 1;
-        //Instantiate(Kari, Pospos, Quaternion.identity);
-
-        int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
-        int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
-
-        for (int length = 0; length <= MaxLMap; length++)
-        {
-            for (int side = 0; side <= MaxSMap; side++)
-            {
-                if (MassArea[length, side] == 1)
-                {
-                    Vector3 Pos = MassObj[length, side].transform.position;
-                    Pos.z += 1;
-                    Instantiate(Kari, Pos, Quaternion.identity);
-                }
-
-            }
-        }
-    }
 
     public void SetMassArea(int num)
     {
@@ -697,8 +660,8 @@ public class BoardMaster : MonoBehaviour
     }
 
     public void TurnStart()
-
     {
+        TurnStartSkills();
         SubtractionSummoningSicknessCharacterList();
     }
   
@@ -727,10 +690,43 @@ public class BoardMaster : MonoBehaviour
 
     void TurnEnd()
     {
+        TurnEndSkills();
         GetComponent<BoardList>().ClearMoveList();
     }
-    public void SetStartAnimation()
+
+    public void SetSummonCharacters(GameObject SetObj)
     {
+        SumonCharacters.Add(SetObj);
+     }
+    void TurnStartSkills()
+    {
+        for (int count = 0; count <= SumonCharacters.Count - 1; count++)
+        {
+            int PlayerNumber = SumonCharacters[count].GetComponent<CharacterStatus>().GetPlayerNumber();
+            if (TurnPlayer == PlayerNumber)
+            {
+                SumonCharacters[count].GetComponent<CharacterStatus>().skill.MyTurnStart();
+            }
+            else
+            {
+                SumonCharacters[count].GetComponent<CharacterStatus>().skill.EnemyTurnStart();
+            }
+        }
+    }
+    void TurnEndSkills()
+    {
+        for (int count = 0; count <= SumonCharacters.Count - 1; count++)
+        {
+            int PlayerNumber = SumonCharacters[count].GetComponent<CharacterStatus>().GetPlayerNumber();
+            if (TurnPlayer == PlayerNumber)
+            {
+                SumonCharacters[count].GetComponent<CharacterStatus>().skill.MyTurnEnd();
+            }
+            else
+            {
+                SumonCharacters[count].GetComponent<CharacterStatus>().skill.EnemyTurnEnd();
+            }
+        }
 
     }
 }
