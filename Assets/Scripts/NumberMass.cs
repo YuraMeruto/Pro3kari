@@ -14,6 +14,9 @@ public class NumberMass : MonoBehaviour
     private int PlayerNumber;
     [SerializeField]
     private GameObject Master;
+    [SerializeField]
+    private List<Material> MaterialList = new List<Material>();
+
     void Start()
     {
         Master = GameObject.Find("Master");
@@ -61,9 +64,14 @@ public class NumberMass : MonoBehaviour
     public void SetPlayerNumber(int set)
     {
         PlayerNumber = set;
-     gameObject.GetComponent<Renderer>().material = Master.GetComponent<MaterialMaster>().GetMaterial(PlayerNumber);
+        SetMaterialNumber();
     }
 
+    public void SetMaterialNumber()
+    {
+        //        gameObject.GetComponent<Renderer>().material. = Master.GetComponent<MaterialMaster>().GetMaterial(PlayerNumber);
+        gameObject.GetComponent<Renderer>().material = MaterialList[PlayerNumber];
+    }
     public int GetPlayerNumber()
     {
         return PlayerNumber;

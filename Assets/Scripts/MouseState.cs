@@ -200,17 +200,11 @@ public class MouseState : MonoBehaviour
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
 
                 AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
+                MasterObject.GetComponent<BoardSkillList>().ActiveEnemyMoveEndSkill();
                 MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
-
-                //                AtachCharObject.GetComponent<CharacterStatus>().SkillStart();
                 AllAtachNull();
-                GetComponent<Player>().SetState(Player.PlayerStatus.None);/*
-                bool IsSkillret = AtachCharObject.GetComponent<CharacterStatus>().GetIsSkill();
-                if (IsSkillret)
-                {
-                    AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//戦闘が始まったときのキャラクターのスキルの処理
-                }
-                */
+                GetComponent<Player>().SetState(Player.PlayerStatus.None);
+                
             }
         }
         AllAtachNull();
@@ -372,11 +366,10 @@ public class MouseState : MonoBehaviour
                 //AtachCharObject.GetComponent<CharacterStatus>().skill.BattleStart();//戦闘が始まったときのキャラクターのスキルの処理
                 skillactive = SkillActivate.None;
                 return true;
-                break;
             case SkillActivate.No:
                 skillactive = SkillActivate.None;
                 return true;
-                break;
+                
             case SkillActivate.None:
                 break;
         }

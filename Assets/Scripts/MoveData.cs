@@ -45,7 +45,6 @@ public class MoveData : MonoBehaviour
             for (int x = 0; x <= MoveDataMaxSideSize; x++)
             {
                 ReadMoveData[z, x] = ReadObj.GetComponent<ReadCsv>().InputMoveData(z, x);
-                Debug.Log(ReadMoveData[z, x]);
                 if (ReadMoveData[z, x] == 2)
                 {
                     CSVMyPositionX = x;//CSVのいる中心の座標X
@@ -200,7 +199,6 @@ public class MoveData : MonoBehaviour
                 {
                     bool IsOut = true;
                     IsOut = OutSideTheArea(NowMyPosz + KariZ, NowMyPosx + KariX);
-                    Debug.Log(IsOut);
                     if (IsOut)
                     {
                         bool ret = true;

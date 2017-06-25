@@ -141,4 +141,8 @@ public class CharacterStatus : MonoBehaviour
             CharcterHp = MaxHp;
         }
     }
+    public void SetDamage(int num)
+    {
+        CharcterHp -= num;
+    }
 }

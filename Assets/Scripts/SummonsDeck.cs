@@ -51,7 +51,7 @@ public class SummonsDeck : MonoBehaviour
             if (Master.GetComponent<BoardMaster>().GetTurnPlayer() == 1)
             {
                 Player = true;
-                int y = 1;
+            
                 InstancePos.z = 1;
                 InstancePos.y -= 5;
                 InstancePos.x -= 4;
@@ -59,7 +59,7 @@ public class SummonsDeck : MonoBehaviour
             if (Master.GetComponent<BoardMaster>().GetTurnPlayer() == 2)
             {
                 Player = false;
-                int y = 1;
+          
                 InstancePos.z = 1;
                 InstancePos.y += 5;
                 InstancePos.x += 4;

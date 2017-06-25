@@ -19,7 +19,6 @@ public class SummonsPosData : MonoBehaviour {
         int countz = 0;
         int copyx = 0;
         int copyz = 0;
-        bool ini = false;
         StreamReader sr = new StreamReader(Application.dataPath + "/" + "SummonsPosData.csv", Encoding.GetEncoding("Shift_JIS"));
         while (sr.Peek() >= 0)
         {
@@ -37,7 +36,6 @@ public class SummonsPosData : MonoBehaviour {
             copyx = countx;
             countx = 0;
             countz++;
-            ini = true;
         }
 
         MaxSideSize = copyx - 1;

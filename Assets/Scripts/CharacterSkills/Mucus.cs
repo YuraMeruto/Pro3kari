@@ -73,7 +73,9 @@ public class Mucus : SkillBase
     public override void MoveEnd()
     {
     }
-
+    public override void EnemyMoveEnd()
+    {
+    }
     void HpRecoverySkill()
     {
         Debug.Log("始まりの粘液のスキル発動");

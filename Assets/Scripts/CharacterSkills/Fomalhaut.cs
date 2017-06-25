@@ -2,8 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lancelot : SkillBase {
+public class Fomalhaut : SkillBase
+{
 
+    [SerializeField]
+    private int SkillCount = 1;
     [SerializeField]
     private GameObject SkillInstanceObj;
     [SerializeField]
@@ -17,7 +20,6 @@ public class Lancelot : SkillBase {
         Parent = gameObject.transform.parent.gameObject;
         Master = GameObject.Find("Master");
         PlayerObj = GameObject.Find("Main Camera");
-        Debug.Log(PlayerObj);
     }
     private int NowMyPosLength;
     private int NowMyPosSide;
@@ -48,23 +50,26 @@ public class Lancelot : SkillBase {
     {
 
     }
+
     public override void AtTheStart()
     {
     }
     public override void AtTheEnd()
     {
+
     }
     public override void BattleStart()
     {
+
     }
     public override void BattleEnd()
     {
-        Debug.Log(gameObject);
-        GalahadSkill();
+
     }
 
     public override void MoveStart()
     {
+
     }
     public override void MoveEnd()
     {
@@ -74,15 +79,6 @@ public class Lancelot : SkillBase {
     }
     public void DestroySkill()
     {
-
-    }
-
-    void GalahadSkill()
-    {
-        Debug.Log(" ランスロットスキル発動");
-        int damage = PlayerObj.GetComponent<AtachMaster>().GetDamage();
-        damage = damage / 2;
-        Parent.GetComponent<CharacterStatus>().SetHpAdd(damage);
 
     }
 }

@@ -82,7 +82,6 @@ public class BoardMaster : MonoBehaviour
                 if (length == 0 && side == 0)
                     masscolor = 1;
                 GameObject Mass = Instantiate(ObjMass[masscolor], InstancePos, Quaternion.identity);
-                Mass.GetComponent<NumberMass>().SetPlayerNumber(TurnPlayer);
                 Mass.transform.SetParent(transform);
                 Mass.layer = 8;
                 Mass.name = count.ToString();
@@ -113,13 +112,16 @@ public class BoardMaster : MonoBehaviour
             }
 
         }
-        for (int x = 0; x <= MaxLength; x++)
+        for (int x = 0; x < MaxLength; x++)
         {
             MassArea[0, x] = 1;
+            MassObj[0, x].GetComponent<NumberMass>().SetPlayerNumber(1);
             MassArea[1, x] = 1;
+            MassObj[1, x].GetComponent<NumberMass>().SetPlayerNumber(1);
             MassArea[7, x] = 2;
+            MassObj[7, x].GetComponent<NumberMass>().SetPlayerNumber(2);
             MassArea[6, x] = 2;
-
+            MassObj[6, x].GetComponent<NumberMass>().SetPlayerNumber(2);
         }
         MaxNumber = count;
         //デッキの生成開始   
@@ -322,6 +324,8 @@ public class BoardMaster : MonoBehaviour
                 if (MassNum[length, side] == newnum)
                 {
                     CharObj[length, side] = charobj;
+                    GetComponent<BoardSkillList>().SetPosLength(length);
+                    GetComponent<BoardSkillList>().SetPosSide(side);
                     Instantiate(Kari, MassObj[length, side].transform.position, Quaternion.identity);//仮でしています
                 }
 
@@ -542,8 +546,6 @@ public class BoardMaster : MonoBehaviour
     {
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
-        Debug.Log(MaxLMap);
-        Debug.Log(MaxSMap);
         for (int length = 0; length <= MaxLMap; length++)
         {
             for (int side = 0; side <= MaxSMap; side++)
@@ -717,5 +719,16 @@ public class BoardMaster : MonoBehaviour
             }
         }
 
+    }
+    //聖女のスキルに使用
+    public void SaintSkill(int posy,int posx,int damage)
+    {
+        CharObj[posy, posx].GetComponent<CharacterStatus>().SetDamage(damage);
+    }
+
+    public int GetPlayerArea(int length,int side)
+    {
+        int number = MassObj[length, side].GetComponent<NumberMass>().GetPlayerNumber();
+        return number;
     }
 }

@@ -66,8 +66,10 @@ public class Jajah : SkillBase
     }
     public override void BattleEnd()
     {
-        //      DestroySkill();
+    }
 
+    public override void EnemyMoveEnd()
+    {
     }
 
     public override void MoveStart()
@@ -77,7 +79,6 @@ public class Jajah : SkillBase
     }
     public override void MoveEnd()
     {
-        // DestroySkill();
     }
 
     public void DestroySkill()

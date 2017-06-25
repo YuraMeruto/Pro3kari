@@ -70,7 +70,9 @@ public class Galahad : SkillBase
     public override void MoveEnd()
     {
     }
-
+    public override void EnemyMoveEnd()
+    {
+    }
     public void DestroySkill()
     {
  

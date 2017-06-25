@@ -2,8 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Lancelot : SkillBase {
-
+public class Saint : SkillBase {
+    [SerializeField]
+    private int SkillCount = 1;
     [SerializeField]
     private GameObject SkillInstanceObj;
     [SerializeField]
@@ -12,19 +13,19 @@ public class Lancelot : SkillBase {
     private GameObject Parent;
     [SerializeField]
     private GameObject PlayerObj;
+    [SerializeField]
+    private int SkillDamage;
     void Start()
     {
         Parent = gameObject.transform.parent.gameObject;
         Master = GameObject.Find("Master");
         PlayerObj = GameObject.Find("Main Camera");
-        Debug.Log(PlayerObj);
+        Master.GetComponent<BoardSkillList>().SetEnemyMoveEndSkillList(Parent);
     }
     private int NowMyPosLength;
     private int NowMyPosSide;
     private int MaxLength;
     private int MaxSide;
-    [SerializeField]
-    GameObject IsEnemyObj;
 
 
     [SerializeField]
@@ -48,41 +49,46 @@ public class Lancelot : SkillBase {
     {
 
     }
+
     public override void AtTheStart()
     {
     }
     public override void AtTheEnd()
     {
+
     }
     public override void BattleStart()
     {
+
     }
     public override void BattleEnd()
     {
-        Debug.Log(gameObject);
-        GalahadSkill();
+
     }
 
     public override void MoveStart()
     {
+
     }
     public override void MoveEnd()
     {
     }
+
     public override void EnemyMoveEnd()
     {
+        AreaDamageSkill();
     }
-    public void DestroySkill()
+    public void AreaDamageSkill()
     {
-
-    }
-
-    void GalahadSkill()
-    {
-        Debug.Log(" ランスロットスキル発動");
-        int damage = PlayerObj.GetComponent<AtachMaster>().GetDamage();
-        damage = damage / 2;
-        Parent.GetComponent<CharacterStatus>().SetHpAdd(damage);
-
+        Debug.Log("聖女のスキル発動");
+        int EnemyNowPosX = Master.GetComponent<BoardSkillList>().GetPosLength();
+        int EnemyNowPosY = Master.GetComponent<BoardSkillList>().GetPosSide();
+        int result = Master.GetComponent<BoardMaster>().GetPlayerArea(EnemyNowPosX, EnemyNowPosY);
+        int GetPlayerNumber = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
+        if (GetPlayerNumber == result)
+        {
+            Debug.Log(Parent);
+            Master.GetComponent<BoardMaster>().SaintSkill(EnemyNowPosX, EnemyNowPosY, SkillDamage);
+        }
     }
 }
