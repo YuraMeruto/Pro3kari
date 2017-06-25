@@ -12,6 +12,12 @@ public class NumberMass : MonoBehaviour
     public Status status = Status.None;
     [SerializeField]
     private int PlayerNumber;
+    [SerializeField]
+    private GameObject Master;
+    void Start()
+    {
+        Master = GameObject.Find("Master");
+    }
     public void SetNumber(int num)
     {
         Number = num;
@@ -55,6 +61,7 @@ public class NumberMass : MonoBehaviour
     public void SetPlayerNumber(int set)
     {
         PlayerNumber = set;
+     gameObject.GetComponent<Renderer>().material = Master.GetComponent<MaterialMaster>().GetMaterial(PlayerNumber);
     }
 
     public int GetPlayerNumber()

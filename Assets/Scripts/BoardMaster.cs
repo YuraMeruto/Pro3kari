@@ -82,6 +82,7 @@ public class BoardMaster : MonoBehaviour
                 if (length == 0 && side == 0)
                     masscolor = 1;
                 GameObject Mass = Instantiate(ObjMass[masscolor], InstancePos, Quaternion.identity);
+                Mass.GetComponent<NumberMass>().SetPlayerNumber(TurnPlayer);
                 Mass.transform.SetParent(transform);
                 Mass.layer = 8;
                 Mass.name = count.ToString();
@@ -601,19 +602,7 @@ public class BoardMaster : MonoBehaviour
         //  Vector3 InstancePos = SPPos.transform.position;
         //  PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
     }
-    public void DebugMassArea()
-    {
-        for (int l = 0; l < MaxLength; l++)
-        {
-            for (int s = 0; s < MaxSide; s++)
-                if (MassArea[l, s] == 1)
-                {
-                    Vector3 p = MassObj[l, s].transform.position;
-                    p.z += 1;
-                    Instantiate(Kari, p, Quaternion.identity);
-                }
-        }
-    }//デバック用
+   
 
     public bool UseSP(int costnum)
     {
