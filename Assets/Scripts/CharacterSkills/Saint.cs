@@ -78,6 +78,14 @@ public class Saint : SkillBase {
     {
         AreaDamageSkill();
     }
+    public override void DestroyChar()
+    {
+
+    }
+    public override void SkillTargetActive()
+    {
+
+    }
     public void AreaDamageSkill()
     {
         Debug.Log("聖女のスキル発動");

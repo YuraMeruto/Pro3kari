@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing };
+    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing,SkillTargetChoosing,SkillTargetAlready };
     [SerializeField]
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
@@ -165,6 +165,12 @@ public class Player : MonoBehaviour
                         //AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
                         GetComponent<MouseState>().SummonCard();
                         break;
+
+                    case PlayerStatus.SkillTargetChoosing:
+                        GetComponent<AtachMaster>().SetAttachMassObject(hit.collider.gameObject);
+                        GetComponent<MouseState>().SkillTarget();
+                        status = PlayerStatus.SkillTargetAlready;
+                        break;
                 }
             }
 
@@ -202,7 +208,7 @@ public class Player : MonoBehaviour
             }
             IsSkillSwitch = true;
         }
-        else if (Input.GetMouseButtonUp(0))
+        else if (Input.GetMouseButtonUp(0))//マウスのクリックが離されたとき
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
 
@@ -223,6 +229,12 @@ public class Player : MonoBehaviour
                         }
                         GetComponent<MouseState>().SwitchPlayerChoose();
                         break;
+
+                    case PlayerStatus.SkillTargetAlready:
+                        GameObject skillinvorker = GetComponent<AtachMaster>().GetSkillInvoker();
+                        skillinvorker.GetComponent<CharacterStatus>().skill.SkillTargetActive();
+                        break;
+
                 }
             }
 
@@ -276,6 +288,7 @@ public class Player : MonoBehaviour
             Debug.Log("スキルオン!!!");
             //particleobj.SetActive(true);
             atachobj.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(true);
+            atachobj.GetComponent<CharacterStatus>().skill.SkillIsActive();
             SkillSwitchTime = 0;
             IsSkillSwitch = true;
             return;
@@ -301,320 +314,5 @@ public class Player : MonoBehaviour
             Destroy(clone);
         }
     }
-
-    /*
-    void SwitchPlayerNone()//何も選択していない状態でキャラクターを選択した時
-    {
-        //        CopyAtachMassObject = AtachMassObject;
-        //       AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
-        CopyAtachMassObject = GetComponent<AtachMaster>().GetAttachMassObj();
-        AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
-        AtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(AtachMassNumber);
-//        AtachCharObject = GetComponent<AtachMaster>().GetAttachCharObj();
-        bool IsEnemy = false;
-        if (AtachCharObject != null)
-        {
-            AtachCharNumber = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
-        }
-        int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        if (AtachCharNumber != MasterTurnNumber)//もし選択したマスが自分のキャラクターでなければスルーさせる
-        {
-            Debug.Log("キャラクターではないのでスルーします");
-            IsEnemy = true;
-        }
-        if (!IsEnemy)
-        {
-            if (AtachCharObject != null)
-            {
-                Debug.Log(AtachCharObject.name);
-                int retnum = AtachCharObject.GetComponent<CharacterStatus>().GetSummoningSickness();
-                if (retnum == 0)
-                {
-                    AtachCharObject.GetComponent<MoveData>().IsPossibleMove(AtachMassNumber);
-                    status = PlayerStatus.Choose;
-                }
-            }
-        }
-    }
-
-    void SwitchPlayerChoose()//キャラクターを選択していたら
-    {
-        bool ret;
-        CopyAttachMassNumber = CopyAtachMassObject.GetComponent<NumberMass>().GetNumber();
-        GameObject CopyAtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(CopyAttachMassNumber);
-        bool IsSamePlayerCharObj = true;
-        if (CopyAtachCharObject != null)
-        {
-            int CopyAtachCharPlayerNumber = CopyAtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
-            int AtachcharCHarPlayerNumber = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
-            if (AtachcharCHarPlayerNumber == CopyAtachCharPlayerNumber)//ほかの自分のキャラクターだったらそのキャラクターにアタッチさせる
-            {
-                IsSamePlayerCharObj = false;
-                status = PlayerStatus.None;
-                AllIsMoveAreaDestroy();
-                AllSummonsCardDestroy();
-                if (AtachDeckObj != null)
-                {
-                    AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                }
-            }
-        }
-        if (IsSamePlayerCharObj)
-        {
-            IsEnemyObj = null;
-            ret = MasterObject.GetComponent<BoardMaster>().GetIsMove(CopyAttachMassNumber);
-
-            IsEnemyObj = MasterObject.GetComponent<BoardMaster>().GetCharObject(CopyAttachMassNumber);//移動先が敵の駒があるのか確認
-            if (IsEnemyObj != null)
-            {
-                int EnemyPlayerNumber = IsEnemyObj.GetComponent<CharacterStatus>().GetPlayerNumber();
-                int MyPlayerNumber = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
-                if (MyPlayerNumber == EnemyPlayerNumber)//同じプレイヤーのキャラクターなら消さない
-                {
-                    IsEnemyObj = null;
-                }
-                AtachCharObject.GetComponent<CharacterStatus>().skill.BattleStart();//戦闘が始まったときのキャラクターのスキルの処理
-                var BattleRet = ResultBattleScene();
-                switch (BattleRet)
-                {
-
-                    case BattleResult.Win://先に攻撃したキャラクターが勝った場合
-                        Destroy(IsEnemyObj);
-                        AllIsMoveAreaDestroy();
-                        AllSummonsCardDestroy();
-                        if (AtachDeckObj != null)
-                        {
-                            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                        }
-                        MovePos.z = 1.0f;
-                        AtachCharObject.transform.position = MovePos;
-                        MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
-                        MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-
-                        AtachCharObject = null;
-                        ret = false;
-
-                        status = PlayerStatus.None;
-                        break;
-
-                    case BattleResult.Lose://先に攻撃したキャラクターが負けた場合
-                        AllIsMoveAreaDestroy();
-                        AllSummonsCardDestroy();
-                        if (AtachDeckObj != null)
-                        {
-                            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                        }
-                        MasterObject.GetComponent<BoardMaster>().SetLoseObj(AtachCharObject, AtachMassNumber);
-                        MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                        AtachCharObject = null;
-                        ret = false;
-                        status = PlayerStatus.None;
-                        break;
-
-                    case BattleResult.Draw://引き分けの場合
-                        MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
-                        AllIsMoveAreaDestroy();
-                        AllSummonsCardDestroy();
-                        if (AtachDeckObj != null)
-                        {
-                            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                        }
-                        MovePos.z = 1.0f;
-                        AtachCharObject.transform.position = MovePos;
-                        //MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
-                        MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                        AtachCharObject = null;
-                        status = PlayerStatus.None;
-                        ret = false;
-                        break;
-
-                }
-                MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
-
-            }
-            if (ret)//通常の移動の時
-            {
-                Debug.Log("通常移動");
-                AllIsMoveAreaDestroy();
-                AllSummonsCardDestroy();
-                if (AtachDeckObj != null)
-                {
-                    AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                }
-                MovePos = MasterObject.GetComponent<BoardMaster>().GetPos(CopyAttachMassNumber);
-                MovePos.z = 1.0f;
-                AtachCharObject.transform.position = MovePos;
-                if (RaceNum == 1)//移動するキャラクターがポーンの場合
-                {
-                    AtachCharObject.GetComponent<CharacterStatus>().SetIsFirst();
-                }
-                MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
-                MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
-                MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
-
-                //                AtachCharObject.GetComponent<CharacterStatus>().SkillStart();
-                AllAtachNull();
-                status = PlayerStatus.None;
-            }
-        }
-        AllAtachNull();
-    }
-    void AllSummonsCardDestroy()//移動範囲の表示のオブジェクトをすべて消す
-    {
-        var clones = GameObject.FindGameObjectsWithTag("SummonsCard");
-        foreach (var clone in clones)
-        {
-            Destroy(clone);
-        }
-    }
-
-    void AllAtachNull()
-    {
-        //AtachCharObject = null;
-        //CopyAtachMassObject = null;
-        //AtachDeckObj = null;
-    }
-    /*
-    void BattleScene()
-    {
-        int MyCharAttack = AtachCharObject.GetComponent<CharacterStatus>().GetAttack();
-        int EnemyHp = IsEnemyObj.GetComponent<CharacterStatus>().GetHp();
-        int ResultHp = EnemyHp - MyCharAttack;
-        IsEnemyObj.GetComponent<CharacterStatus>().SetHp(ResultHp);
-        if (ResultHp <= 0)
-        {
-            Destroy(IsEnemyObj);
-        }
-        else if(ResultHp>0)
-        {
-
-        }
-        
-    }
-   
-    BattleResult ResultBattleScene()
-    {
-        int MyCharHp = AtachCharObject.GetComponent<CharacterStatus>().GetHp();
-        int MyCharAttack = AtachCharObject.GetComponent<CharacterStatus>().GetAttack();
-        int EnemyHp = IsEnemyObj.GetComponent<CharacterStatus>().GetHp();
-        int EnemyAttack = IsEnemyObj.GetComponent<CharacterStatus>().GetAttack();
-
-        int ResultHp = EnemyHp - MyCharAttack;
-        IsEnemyObj.GetComponent<CharacterStatus>().SetHp(ResultHp);
-        if (ResultHp <= 0)//プレイヤーからの攻撃
-        {
-
-            //Destroy(IsEnemyObj);
-            Debug.Log("勝利しました");
-            return BattleResult.Win;
-        }
-
-        ResultHp = MyCharHp - EnemyAttack;
-        if (ResultHp <= 0)//プレイヤーの体力がゼロになったら
-        {
-            AtachCharObject.GetComponent<CharacterStatus>().SetHp(ResultHp);
-            Destroy(AtachCharObject);
-            Debug.Log("勝利しました");
-            Debug.Log(AtachCharObject);
-            return BattleResult.Lose;
-        }
-
-        AtachCharObject.GetComponent<CharacterStatus>().SetHp(ResultHp);
-        Debug.Log("引き分け");
-        //MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber);
-        return BattleResult.Draw;
-    }
-
-
-    void SwitchDeck()
-    {
-        bool IsOpen = AtachDeckObj.GetComponent<SummonsDeck>().GetISCardShow();
-        if (IsOpen)
-        {
-            int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-            int DeckNumber = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
-            if (MasterTurnNumber == DeckNumber)
-            {
-                AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
-                status = PlayerStatus.ShowCard;
-            }
-        }
-        else
-        {
-            status = PlayerStatus.None;
-            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-            AllIsMoveAreaDestroy();
-            AllSummonsCardDestroy();
-            AllKariDestroy();
-        }
-    }//デッキを選択したら
-
-    void ChoosingCard()//カードを選択したら
-    {
-
-        int DictionaryNum;
-        Debug.Log("これはカードです");
-        if (NowPhase == PhaseMaster.Phase.Move)
-        {
-            return;
-        }
-        int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
-        SumonsCost = AtachDeckCardObj.GetComponent<IllustrationCard>().GetSumonCos();
-        DictionaryNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetDictionaryNumber();
-        MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
-        ChoosingCardSummonObj = MasterObject.GetComponent<CharacterMaster>().GetSummonsCharacter(DictionaryNum);
-    }
-
-    void SummonCard()
-    {
-        //召喚できるマスならば
-        bool retIsmove = MasterObject.GetComponent<BoardMaster>().GetIsMove(AtachMassNumber);
-        bool retIsSPCost = MasterObject.GetComponent<BoardMaster>().UseSP(SumonsCost);
-
-        if (retIsmove && retIsSPCost)
-        {
-            MasterObject.GetComponent<BoardMaster>().SPDestroyCall();
-            Debug.Log("召喚!");
-            Vector3 SumonsPos = AtachMassObject.transform.position;
-            SumonsPos.z += 1;
-            InstanceSumonObj = Instantiate(ChoosingCardSummonObj, SumonsPos, ChoosingCardSummonObj.transform.rotation);
-            int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
-            MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
-            MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
-            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-            if (RaceNum != 1)//ポーン以外の召喚酔い
-            {
-                InstanceSumonObj.GetComponent<CharacterStatus>().SetSummoningSickness(1);
-                MasterObject.GetComponent<BoardMaster>().SetSummoningSicknessCharacterList(InstanceSumonObj);
-            }
-            SetIniSummonCard();
-            AllIsMoveAreaDestroy();
-            AllSummonsCardDestroy();
-            AllKariDestroy();
-            status = PlayerStatus.None;
-        }
-    }
-
-    void AllKariDestroy()
-    {
-        var clones = GameObject.FindGameObjectsWithTag("Kari");
-        foreach (var clone in clones)
-        {
-            Destroy(clone);
-        }
-    }
-
-    void SetIniSummonCard()
-    {
-        int pnum;
-        pnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        InstanceSumonObj.GetComponent<CharacterStatus>().SetPlayerNumber(pnum);
-        InstanceSumonObj.GetComponent<MoveData>().ReadSetObj(InstanceSumonObj);
-        InstanceSumonObj.GetComponent<ReadCsv>().SetTargetObj(InstanceSumonObj);
-        InstanceSumonObj.GetComponent<MoveData>().IniSet();
-    }
-
-    */
+    
 }

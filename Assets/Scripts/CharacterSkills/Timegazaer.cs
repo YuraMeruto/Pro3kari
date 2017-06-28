@@ -2,10 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Mucus : SkillBase
-{
-
-
+public class Timegazaer : SkillBase {
 
     [SerializeField]
     private GameObject SkillInstanceObj;
@@ -28,6 +25,7 @@ public class Mucus : SkillBase
     private int NowMyPosSide;
     private int MaxLength;
     private int MaxSide;
+
     [SerializeField]
     GameObject IsEnemyObj;
 
@@ -51,7 +49,6 @@ public class Mucus : SkillBase
 
     public override void EnemyTurnEnd()
     {
-         HpRecoverySkill();
     }
     public override void AtTheStart()
     {
@@ -64,7 +61,6 @@ public class Mucus : SkillBase
     }
     public override void BattleEnd()
     {
-        Debug.Log(gameObject);
     }
 
     public override void MoveStart()
@@ -84,9 +80,38 @@ public class Mucus : SkillBase
     {
 
     }
+    public override void SkillIsActive()
+    {
+        HpRecoverySkill();
+    }
     void HpRecoverySkill()
     {
-        Debug.Log("始まりの粘液のスキル発動");
-        Parent.GetComponent<CharacterStatus>().SetHpAdd(RecoveryNum);
+       GameObject nowmass = PlayerObj.GetComponent<AtachMaster>().GetAttachMassObj();
+       int massplayernum = nowmass.GetComponent<NumberMass>().GetPlayerNumber();
+       int myplayernum = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
+        if(myplayernum != massplayernum)
+        {
+            return;
+        }
+        bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();
+        if (!IsGetSkill)
+        {
+            return;
+        }
+        MouseState.SkillActivate retactive = PlayerObj.GetComponent<MouseState>().GetSkillActive();
+        switch (retactive)
+        {
+            case MouseState.SkillActivate.Yes:
+                Parent.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(false);
+                Parent.GetComponent<CharacterStatus>().SetIsSkill(false);
+                Parent.GetComponent<CharacterStatus>().SetReCovery(RecoveryNum);                
+                PlayerObj.GetComponent<Player>().SetActiveYesNoObjFalse();
+                break;
+
+            case MouseState.SkillActivate.None:
+                PlayerObj.GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.Choosing);
+                PlayerObj.GetComponent<Player>().SetActiveYesNoObjTrue();
+                break;
+        }
     }
 }

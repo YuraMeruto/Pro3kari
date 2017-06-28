@@ -73,11 +73,15 @@ public class Galahad : SkillBase
     public override void EnemyMoveEnd()
     {
     }
-    public void DestroySkill()
-    {
- 
-    }
 
+    public override void DestroyChar()
+    {
+
+    }
+    public override void SkillTargetActive()
+    {
+
+    }
     void GalahadSkill()
     {
         Debug.Log("ガルハットスキル発動");

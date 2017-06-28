@@ -76,7 +76,10 @@ public class Lancelot : SkillBase {
     {
 
     }
+    public override void SkillTargetActive()
+    {
 
+    }
     void GalahadSkill()
     {
         Debug.Log(" ランスロットスキル発動");

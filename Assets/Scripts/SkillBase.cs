@@ -15,4 +15,7 @@ public class SkillBase : MonoBehaviour {
     public virtual void EnemyMoveEnd() { }
     public virtual void BattleStart() { }
     public virtual void BattleEnd() { }
+    public virtual void DestroyChar() { }
+    public virtual void SkillTargetActive() { }
+    public virtual void SkillIsActive() { }
 }

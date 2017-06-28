@@ -85,6 +85,14 @@ public class Solario : SkillBase
     public override void EnemyMoveEnd()
     {
     }
+    public override void DestroyChar()
+    {
+
+    }
+    public override void SkillIsActive()
+    {
+
+    }
     public void RecoveryMoveSkill()
     {
         bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();

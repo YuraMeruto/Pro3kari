@@ -30,7 +30,7 @@ public class MouseState : MonoBehaviour
         GameObject CopyAtachMassObject = GetComponent<AtachMaster>().GetAttachMassObj();
         int AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
         GameObject AtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(AtachMassNumber);
-        bool Ismoveret = MasterObject.GetComponent<BoardList>().GetIsMoveList(AtachCharObject);
+        bool Ismoveret = MasterObject.GetComponent<BoardList>().GetIsMoveList(AtachCharObject);//一度動かしたキャラクターかどうか
         if (!Ismoveret)
         {
             bool IsEnemy = false;
@@ -115,6 +115,7 @@ public class MouseState : MonoBehaviour
                     {
 
                         case BattleScene.BattleResult.Win://先に攻撃したキャラクターが勝った場合
+                            IsEnemyObj.GetComponent<CharacterStatus>().skill.DestroyChar();
                             Destroy(IsEnemyObj);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
@@ -135,6 +136,8 @@ public class MouseState : MonoBehaviour
                             break;
 
                         case BattleScene.BattleResult.Lose://先に攻撃したキャラクターが負けた場合
+                            AtachCharObject.GetComponent<CharacterStatus>().skill.DestroyChar();
+                            Destroy(AtachCharObject);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
                             if (AtachDeckObj != null)
@@ -196,11 +199,11 @@ public class MouseState : MonoBehaviour
                 {
                     AtachCharObject.GetComponent<CharacterStatus>().SetIsFirst();
                 }
+
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-
-                AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときの処理
-                MasterObject.GetComponent<BoardSkillList>().ActiveEnemyMoveEndSkill();
+                AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときのキャラクターのスキル
+                MasterObject.GetComponent<BoardSkillList>().ActiveEnemyMoveEndSkill();//相手の動きが終わったときに発動するスキル
                 MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
                 AllAtachNull();
                 GetComponent<Player>().SetState(Player.PlayerStatus.None);
@@ -349,6 +352,24 @@ public class MouseState : MonoBehaviour
         skillactive = setacitive;
     }
 
+
+    public void SkillTarget()
+    {
+        GameObject CopyAtachMassObject = GetComponent<AtachMaster>().GetAttachMassObj();
+        int AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
+        GameObject AtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(AtachMassNumber);
+        int num = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
+        int turnnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
+        if (num != turnnum)
+        {
+            Debug.Log("ターゲットセット");
+            GetComponent<AtachMaster>().SetSkillTarget(AtachCharObject);
+        }
+    }
+    /// <summary>
+    /// スキルを発動するかどうか
+    /// </summary>
+    /// <returns></returns>
     public bool IsSkill()
     {
         GameObject AtachCharObject = GetComponent<AtachMaster>().GetAttachCharObj();

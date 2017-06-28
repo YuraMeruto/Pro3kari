@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Fomalhaut : SkillBase
-{
+public class Stargazer : SkillBase {
 
-    [SerializeField]
-    private int SkillCount = 1;
+
     [SerializeField]
     private GameObject SkillInstanceObj;
     [SerializeField]
@@ -20,7 +18,7 @@ public class Fomalhaut : SkillBase
         Parent = gameObject.transform.parent.gameObject;
         Master = GameObject.Find("Master");
         PlayerObj = GameObject.Find("Main Camera");
-        Master.GetComponent<BoardSkillList>().SetMyMoveEndSkillAdd(Parent);
+        Debug.Log(PlayerObj);
     }
     private int NowMyPosLength;
     private int NowMyPosSide;
@@ -35,6 +33,11 @@ public class Fomalhaut : SkillBase
 
     public override void MyTurnStart()
     {
+        bool result = Parent.GetComponent<CharacterStatus>().GetIsSkill();
+        if (result)
+        {
+            StargazerSkill();
+        }
 
     }
 
@@ -51,17 +54,14 @@ public class Fomalhaut : SkillBase
     {
 
     }
-
     public override void AtTheStart()
     {
     }
     public override void AtTheEnd()
     {
-
     }
     public override void BattleStart()
     {
-
     }
     public override void BattleEnd()
     {
@@ -70,11 +70,9 @@ public class Fomalhaut : SkillBase
 
     public override void MoveStart()
     {
-
     }
     public override void MoveEnd()
     {
-        FomalhautSkill();
     }
     public override void EnemyMoveEnd()
     {
@@ -82,17 +80,26 @@ public class Fomalhaut : SkillBase
 
     public override void DestroyChar()
     {
-        Master.GetComponent<BoardMaster>().ControlObjRelease(Parent);
-    }
-    public override void SkillTargetActive()
-    {
 
     }
-    public void FomalhautSkill()
+
+    public override void SkillTargetActive()
     {
-        //int PlayerNumber = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
-      GameObject MyMass =  PlayerObj.GetComponent<AtachMaster>().GetCopyAttachMassObj();
-      GameObject DestinationMass = PlayerObj.GetComponent<AtachMaster>().GetAttachMassObj();
-        Master.GetComponent<BoardList>().FomalhautskillResultMoveRoot(MyMass, DestinationMass,Parent);
+        SkillActive();
+    }
+    public void StargazerSkill()
+    {
+        Debug.Log("ターゲットを決めています");
+        PlayerObj.GetComponent<Player>().SetState(Player.PlayerStatus.SkillTargetChoosing);
+        PlayerObj.GetComponent<AtachMaster>().SetSkillInvoker(Parent);
+    }
+
+    public void SkillActive()
+    {
+        Debug.Log("フルカウンター！");
+        int point = Parent.GetComponent<CharacterStatus>().GetDamagePoint();
+        GameObject target = PlayerObj.GetComponent<AtachMaster>().GetSkillTarget();
+        target.GetComponent<CharacterStatus>().SetDamage(point);
+        PlayerObj.GetComponent<Player>().SetState(Player.PlayerStatus.None);
     }
 }

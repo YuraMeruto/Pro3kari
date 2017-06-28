@@ -17,7 +17,7 @@ public class CharacterStatus : MonoBehaviour
     private int CharcterAttack;
 
     [SerializeField]
-    private int SummoningSickness =0;
+    private int SummoningSickness = 0;
     [SerializeField]
     private int SummonsCost;
     public SkillBase skill;
@@ -30,6 +30,8 @@ public class CharacterStatus : MonoBehaviour
     private int MaxHp;
     [SerializeField]
     private GameObject ParticleObj;
+    [SerializeField]
+    private int DamagePoint = 0;
     //Use this for initialization
     void Start()
     {
@@ -125,7 +127,7 @@ public class CharacterStatus : MonoBehaviour
     }
     public void SetReCovery(int recoverynum)
     {
-        
+
     }
 
     public void SetAttackAdd(int Addnum)
@@ -136,13 +138,32 @@ public class CharacterStatus : MonoBehaviour
     public void SetHpAdd(int Addnum)
     {
         CharcterHp += Addnum;
-        if(MaxHp<=CharcterHp)
+        if (MaxHp <= CharcterHp)
         {
             CharcterHp = MaxHp;
         }
     }
     public void SetDamage(int num)
     {
+        Debug.Log(CharcterHp);
+        SetDamagePoint(num);
         CharcterHp -= num;
+        Debug.Log(CharcterHp);
+    }
+
+    //スターゲイザーのスキル専用
+    public void SetDamagePoint(int num)
+    {
+        if (IsSkill)
+        {
+            if (DamagePoint < num)
+            {
+                DamagePoint = num;
+            }
+        }
+    }
+    public int GetDamagePoint()
+    {
+        return DamagePoint;
     }
 }

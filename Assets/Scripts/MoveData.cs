@@ -30,7 +30,7 @@ public class MoveData : MonoBehaviour
     private string FileName;
     private GameObject MainCameraObj;
 
-    
+
     public void IniSet()
     {
         MainCameraObj = GameObject.Find("Main Camera");
@@ -86,20 +86,15 @@ public class MoveData : MonoBehaviour
                         NowMyPosx = side;//自分のマスのポジションの各位置を記録
                         NowMyPosz = length;//自分のマスのポジションの各位置を記録
 
-                        //                        if (retracenum == 1)
-                        //                        {
-                        //                            PornIsPossible();
-                        //                            break;
-                        //                       }
-                        if (playernum == 2)
+
+                        if (playernum == 2)//player２専用
                         {
                             InstanceIsPossibleMoveArea();
                         }
 
-                        else if (playernum == 1)
+                        else if (playernum == 1)//player1専用
                         {
                             InstanceIsPossibleMoveAreaInverted();
-
                         }
                     }
                 }
@@ -139,6 +134,8 @@ public class MoveData : MonoBehaviour
                         if (ret)//移動できるマスであれば
                         {
                             Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[resultz, resultx].transform.position;
+                            GameObject InstancePosObj = Master.GetComponent<BoardMaster>().MassObj[resultz, resultx];
+                            Master.GetComponent<BoardList>().SetRootMoveMass(InstancePosObj);
                             InstancePos.z = 1.0f;
                             GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
                             IsMoveObj.tag = "IsMovetag";
@@ -146,8 +143,6 @@ public class MoveData : MonoBehaviour
                         }
                     }
                 }
-
-
                 else if (karidata == 3)//ポーンの時だけ
                 {
                     bool IsOut = true;
@@ -208,7 +203,7 @@ public class MoveData : MonoBehaviour
                         {
                             int IsCharNumber = IsCharObj.GetComponent<CharacterStatus>().GetPlayerNumber();
                             int MyNumber = this.gameObject.GetComponent<CharacterStatus>().GetPlayerNumber();
-                            if (MyNumber == IsCharNumber)
+                            if (MyNumber == IsCharNumber)//移動先のマスが自分と同じキャラクターなら
                             {
                                 ret = false;
                             }
@@ -254,14 +249,7 @@ public class MoveData : MonoBehaviour
                                 Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
                             }
                         }
-                        //                        if (ret)//移動できるマスであれば
-                        //                        {
-                        // Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;
-                        // InstancePos.z = 1.0f;
-                        // GameObject IsMoveObj = Instantiate(MoveAreaObj, InstancePos, Quaternion.identity) as GameObject;
-                        // IsMoveObj.tag = "IsMovetag";
-                        // Master.GetComponent<BoardMaster>().SetIsMove(NowMyPosz + KariZ, NowMyPosx + KariX, true);
-                        //                      }
+
                     }
 
                 }

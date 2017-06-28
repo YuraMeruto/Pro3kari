@@ -80,7 +80,14 @@ public class Jajah : SkillBase
     public override void MoveEnd()
     {
     }
+    public override void DestroyChar()
+    {
 
+    }
+    public override void SkillTargetActive()
+    {
+
+    }
     public void DestroySkill()
     {
         bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();

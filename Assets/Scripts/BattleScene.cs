@@ -23,11 +23,12 @@ public class BattleScene : MonoBehaviour
         if (IsBattleStart)
         {
             int ResultHp = EnemyHp - MyCharAttack;
+            EnemyObject.GetComponent<CharacterStatus>().SetDamagePoint(MyCharAttack);
             EnemyObject.GetComponent<CharacterStatus>().SetHp(ResultHp);
             GetComponent<AtachMaster>().SetDamage(MyCharAttack);
             if (ResultHp <= 0)//プレイヤーからの攻撃
             {
-
+               
                 //Destroy(IsEnemyObj);
                 Debug.Log("勝利しました");
 
@@ -38,15 +39,14 @@ public class BattleScene : MonoBehaviour
             if (ResultHp <= 0)//プレイヤーの体力がゼロになったら
             {
                 AttachCharcterObject.GetComponent<CharacterStatus>().SetHp(ResultHp);
-                Destroy(AttachCharcterObject);
-                Debug.Log("勝利しました");
+              //  Destroy(AttachCharcterObject);
+                Debug.Log("負けました");
                 Debug.Log(AttachCharcterObject);
                 return BattleResult.Lose;
             }
 
             AttachCharcterObject.GetComponent<CharacterStatus>().SetHp(ResultHp);
             Debug.Log("引き分け");
-            //MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber);
             return BattleResult.Draw;
         }
         else

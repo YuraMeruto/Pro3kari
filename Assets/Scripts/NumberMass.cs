@@ -17,6 +17,14 @@ public class NumberMass : MonoBehaviour
     [SerializeField]
     private List<Material> MaterialList = new List<Material>();
 
+    [SerializeField]
+    private int XArrayNum;
+    [SerializeField]
+    private int YArrayNum;
+    [SerializeField]
+    private int DefaltMaterialNumber;
+    [SerializeField]
+    private GameObject ControllingCharacter;
     void Start()
     {
         Master = GameObject.Find("Master");
@@ -72,8 +80,59 @@ public class NumberMass : MonoBehaviour
         //        gameObject.GetComponent<Renderer>().material. = Master.GetComponent<MaterialMaster>().GetMaterial(PlayerNumber);
         gameObject.GetComponent<Renderer>().material = MaterialList[PlayerNumber];
     }
+    public void SetMaterialDefalt()
+    {
+        gameObject.GetComponent<Renderer>().material = MaterialList[DefaltMaterialNumber];
+    }
+    //スキルによる効果
+    public void SetMaterialNumber(int num)
+    {
+        //        gameObject.GetComponent<Renderer>().material. = Master.GetComponent<MaterialMaster>().GetMaterial(PlayerNumber);
+        gameObject.GetComponent<Renderer>().material = MaterialList[num];
+    }
     public int GetPlayerNumber()
     {
         return PlayerNumber;
+    }
+
+    public void SetXArryNumber(int setnum)
+    {
+        XArrayNum = setnum;
+    }
+
+    public void SetYArryNumber(int setnum)
+    {
+        YArrayNum = setnum;
+    }
+
+    public int GetXArrayNumber()
+    {
+        return XArrayNum;
+    }
+
+    public int GetYArrayNumber()
+    {
+        return YArrayNum;
+    }
+
+    public void SetDefaltNumber(int setnum)
+    {
+        DefaltMaterialNumber = setnum;
+    }
+
+    public int GetDefaltNumber()
+    {
+        return DefaltMaterialNumber;
+    }
+
+    //フォーマルハウトのスキルで使用
+    public void SetControlObj(GameObject setobj)
+    {
+        ControllingCharacter = setobj;
+    }
+
+    public GameObject GetControlObj()
+    {
+        return ControllingCharacter;
     }
 }

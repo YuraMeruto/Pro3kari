@@ -9,7 +9,8 @@ public class BoardList : MonoBehaviour
     public List<GameObject> SkillTargetList = new List<GameObject>();
     [SerializeField]
     public List<GameObject> MoveList = new List<GameObject>();
-
+    [SerializeField]
+    private List<GameObject> RootMoveMass;
     // Update is called once per frame
     public void SetSkillList(GameObject setobj)
     {
@@ -50,7 +51,7 @@ public class BoardList : MonoBehaviour
         return false;
     }
 
-    public void SetMoveList( GameObject setobj)
+    public void SetMoveList(GameObject setobj)
     {
         MoveList.Add(setobj);
     }
@@ -79,5 +80,65 @@ public class BoardList : MonoBehaviour
     public void ClearMoveList()
     {
         MoveList.Clear();
+    }
+
+    //キャラクターが通るマスめ
+    public void SetRootMoveMass(GameObject setmass)
+    {
+        RootMoveMass.Add(setmass);
+        
+    }
+
+    public void Clear()
+    {
+        RootMoveMass.Clear();
+    }
+    //フォールマルハウトのスキル専用
+    public void FomalhautskillResultMoveRoot(GameObject MyMass, GameObject DestinationMass,GameObject ControlObj)
+    {
+
+        int MyMassX = MyMass.GetComponent<NumberMass>().GetXArrayNumber();
+        int MyMassY = MyMass.GetComponent<NumberMass>().GetYArrayNumber();
+        int DestinationMassX = DestinationMass.GetComponent<NumberMass>().GetXArrayNumber();//移動先のマス
+        int DestinationMassY = DestinationMass.GetComponent<NumberMass>().GetYArrayNumber();//移動先のマス
+        int XAdd;
+        int YAdd;
+        if (MyMassX > DestinationMassX)
+        {
+            XAdd = -1;
+        }
+        else
+        {
+            XAdd = 1;
+        }
+
+        if(MyMassY > DestinationMassY)
+        {
+            YAdd = -1;
+        }
+        else
+        {
+            YAdd = 1;
+        }
+
+        for(int count=0;count<100;count++)
+        {
+            gameObject.GetComponent<BoardMaster>().SetMassObjAreaChange(ref MyMassY, ref MyMassX, ControlObj);
+            if (MyMassX != DestinationMassX)
+            {
+                MyMassX += XAdd;
+            }
+            if (MyMassY != DestinationMassY)
+            {
+                MyMassY += YAdd;
+            }
+            if (MyMassX == DestinationMassX && MyMassY == DestinationMassY)
+            {
+                break;
+            }
+            Debug.Log(MyMassY);
+            Debug.Log(MyMassX);
+        }
+        ClearMoveList();
     }
 }

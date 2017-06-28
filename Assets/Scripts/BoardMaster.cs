@@ -8,7 +8,7 @@ public class BoardMaster : MonoBehaviour
 
     [SerializeField]
     private List<GameObject> CharacterList = new List<GameObject>();
-    private enum Phase {None,Main1,Move,Main2,TurnEnd };
+    private enum Phase { None, Main1, Move, Main2, TurnEnd };
     private Phase phase = Phase.Main1;
     [SerializeField]
     private string FileName;
@@ -87,7 +87,10 @@ public class BoardMaster : MonoBehaviour
                 Mass.name = count.ToString();
                 IsMoveMassObj[length, side] = false;
                 Mass.GetComponent<NumberMass>().SetNumber(count);
+                Mass.GetComponent<NumberMass>().SetXArryNumber(side);
+                Mass.GetComponent<NumberMass>().SetYArryNumber(length);
                 MassObj[length, side] = Mass;
+                MassObj[length,side].GetComponent<NumberMass>().SetDefaltNumber(0);
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
                 count++;
@@ -116,12 +119,16 @@ public class BoardMaster : MonoBehaviour
         {
             MassArea[0, x] = 1;
             MassObj[0, x].GetComponent<NumberMass>().SetPlayerNumber(1);
+            MassObj[0, x].GetComponent<NumberMass>().SetDefaltNumber(1);
             MassArea[1, x] = 1;
             MassObj[1, x].GetComponent<NumberMass>().SetPlayerNumber(1);
+            MassObj[1, x].GetComponent<NumberMass>().SetDefaltNumber(1);
             MassArea[7, x] = 2;
             MassObj[7, x].GetComponent<NumberMass>().SetPlayerNumber(2);
+            MassObj[7, x].GetComponent<NumberMass>().SetDefaltNumber(2);
             MassArea[6, x] = 2;
             MassObj[6, x].GetComponent<NumberMass>().SetPlayerNumber(2);
+            MassObj[6, x].GetComponent<NumberMass>().SetDefaltNumber(2);
         }
         MaxNumber = count;
         //デッキの生成開始   
@@ -377,7 +384,7 @@ public class BoardMaster : MonoBehaviour
 
     public void SetTurnPlayer()
     {
-        
+
         Debug.Log("ターンが変わったよ");
         GetComponent<SkillsMaster>().EndSkills();//登録されているキャラクターのスキル発動
         PlayerObj[TurnPlayer].GetComponent<SP>().ClearList();//ターンが変わる前にいったん全部消す
@@ -390,14 +397,14 @@ public class BoardMaster : MonoBehaviour
                 PlayerTurnUI.GetComponent<PlayerTurn>().SetColorBlue();
                 PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownTrue();
                 PlayerTurnUI.GetComponent<PlayerTurn>().SetText("プレイヤー2のターン");
-               // PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownFalse();
+                // PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownFalse();
                 break;
             case 2:
                 TurnPlayer = 1;
                 PlayerTurnUI.GetComponent<PlayerTurn>().SetColorRed();
                 PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownTrue();
                 PlayerTurnUI.GetComponent<PlayerTurn>().SetText("プレイヤー1のターン");
-               // PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownFalse();
+                // PlayerTurnUI.GetComponent<PlayerTurn>().IsSetDownFalse();
                 break;
         }
         TurnStart();
@@ -594,17 +601,8 @@ public class BoardMaster : MonoBehaviour
         }
     }
 
-    /// <summary>
-    /// SPObjを生成
-    /// </summary>
-    public void InstanceSP()
-    {
-        //  int SPCount;
-        // SPCount = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
-        //  Vector3 InstancePos = SPPos.transform.position;
-        //  PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
-    }
-   
+
+
 
     public bool UseSP(int costnum)
     {
@@ -655,13 +653,13 @@ public class BoardMaster : MonoBehaviour
         TurnStartSkills();
         SubtractionSummoningSicknessCharacterList();
     }
-  
+
     public void SPDestroyCall()
     {
         PlayerObj[TurnPlayer].GetComponent<SP>().DestroyList(CopyCost);
     }
 
-   
+
 
     public void CharacterTurnStartSkill()
     {
@@ -671,11 +669,11 @@ public class BoardMaster : MonoBehaviour
     public void MoveCountSubtraction()
     {
         MoveCount--;
-        if(MoveCount<=0)
+        if (MoveCount <= 0)
         {
             GetComponent<PhaseMaster>().NextFase();
             MoveCount = 2;
-        //    SetTurnPlayer();
+            //    SetTurnPlayer();
         }
     }
 
@@ -688,7 +686,7 @@ public class BoardMaster : MonoBehaviour
     public void SetSummonCharacters(GameObject SetObj)
     {
         SumonCharacters.Add(SetObj);
-     }
+    }
     void TurnStartSkills()
     {
         for (int count = 0; count <= SumonCharacters.Count - 1; count++)
@@ -721,14 +719,64 @@ public class BoardMaster : MonoBehaviour
 
     }
     //聖女のスキルに使用
-    public void SaintSkill(int posy,int posx,int damage)
+    public void SaintSkill(int posy, int posx, int damage)
     {
         CharObj[posy, posx].GetComponent<CharacterStatus>().SetDamage(damage);
     }
 
-    public int GetPlayerArea(int length,int side)
+    public int GetPlayerArea(int length, int side)
     {
         int number = MassObj[length, side].GetComponent<NumberMass>().GetPlayerNumber();
         return number;
+    }
+
+    //フォーマルハウト専用のスキル
+    public void SetMassObjAreaChange(ref int lenght,ref int side,GameObject ControlObj)
+        {
+        int num = MassObj[lenght, side].GetComponent<NumberMass>().GetDefaltNumber();
+        switch (TurnPlayer)
+        {
+            case 1:
+                if (num == 2)
+                {
+                    break;
+                }
+                else
+                {
+                    MassObj[lenght, side].GetComponent<NumberMass>().SetMaterialNumber(TurnPlayer);
+                    MassObj[lenght, side].GetComponent<NumberMass>().SetControlObj(ControlObj);
+                }
+                break;
+
+            case 2:
+                if (num == 1)
+                {
+                    break;
+                }
+                else
+                {
+                    MassObj[lenght, side].GetComponent<NumberMass>().SetMaterialNumber(TurnPlayer);
+                    MassObj[lenght, side].GetComponent<NumberMass>().SetControlObj(ControlObj);
+                }
+
+                break;
+        }
+
+        }
+    public void ControlObjRelease(GameObject obj)
+    {
+        Debug.Log(obj);
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+              GameObject resultobj = MassObj[length, side].GetComponent<NumberMass>().GetControlObj();
+                if(resultobj == obj)
+                {
+                    MassObj[length, side].GetComponent<NumberMass>().SetControlObj(null);
+                    MassObj[length, side].GetComponent<NumberMass>().SetMaterialDefalt(); 
+                }
+            }
+        }
     }
 }

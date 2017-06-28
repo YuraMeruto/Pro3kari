@@ -29,6 +29,10 @@ public class AtachMaster : MonoBehaviour
     [SerializeField]
     private int Damage =100;
     private int AttachMassNumber;
+    [SerializeField]
+    private GameObject SkillTarget;
+    [SerializeField]
+    private GameObject SkillInvoker;
     public void SetAttachMassObject(GameObject setobj)
     {
         AttachMassObject = setobj;
@@ -39,6 +43,7 @@ public class AtachMaster : MonoBehaviour
     {
         CopyAttachMassObject = setobj;
     }
+
     public void SetEnemyObj(GameObject setobj)
     {
         EnemyObjct = setobj;
@@ -77,6 +82,14 @@ public class AtachMaster : MonoBehaviour
         Damage = setdamage;
     }
 
+    public void SetSkillTarget(GameObject setobj)
+    {
+        SkillTarget = setobj;
+    }
+    public void SetSkillInvoker(GameObject setobj)
+    {
+        SkillInvoker = setobj;
+    }
 
     //Get関係
     public GameObject GetAttachMassObj()
@@ -132,5 +145,15 @@ public class AtachMaster : MonoBehaviour
     public int GetDamage()
     {
         return Damage;
+    }
+
+    public GameObject GetSkillTarget()
+    {
+        return SkillTarget;
+    }
+
+    public GameObject GetSkillInvoker()
+    {
+        return SkillInvoker;
     }
 }
