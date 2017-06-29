@@ -68,6 +68,8 @@ public class Timegazaer : SkillBase {
     }
     public override void MoveEnd()
     {
+        Debug.Log("スキル発動タイムゲイザー");
+        HpRecoverySkill();
     }
     public override void EnemyMoveEnd()
     {
@@ -89,12 +91,12 @@ public class Timegazaer : SkillBase {
        GameObject nowmass = PlayerObj.GetComponent<AtachMaster>().GetAttachMassObj();
        int massplayernum = nowmass.GetComponent<NumberMass>().GetPlayerNumber();
        int myplayernum = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
-        if(myplayernum != massplayernum)
+        if(myplayernum != massplayernum)//発動場所が今自分の場所なのか？
         {
             return;
         }
         bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();
-        if (!IsGetSkill)
+        if (!IsGetSkill)//スキルを発動状態にしているか
         {
             return;
         }
@@ -102,14 +104,17 @@ public class Timegazaer : SkillBase {
         switch (retactive)
         {
             case MouseState.SkillActivate.Yes:
+                Debug.Log("タイムゲイザーの効果発動");
                 Parent.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(false);
                 Parent.GetComponent<CharacterStatus>().SetIsSkill(false);
                 Parent.GetComponent<CharacterStatus>().SetReCovery(RecoveryNum);                
                 PlayerObj.GetComponent<Player>().SetActiveYesNoObjFalse();
+                PlayerObj.GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.None);
                 break;
 
             case MouseState.SkillActivate.None:
                 PlayerObj.GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.Choosing);
+                PlayerObj.GetComponent<AtachMaster>().SetSkillInvoker(Parent);
                 PlayerObj.GetComponent<Player>().SetActiveYesNoObjTrue();
                 break;
         }

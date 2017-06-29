@@ -6,28 +6,19 @@ public class SkillState : MonoBehaviour {
 
     public void SkillActive()
     {
-        MouseState.SkillActivateGo retgo = GetComponent<MouseState>().GetSkillActiveGo();
-        GameObject AtachOject = GetComponent<AtachMaster>().GetAttachCharObj();
-        Debug.Log(retgo);
-        Debug.Break();
-        switch (retgo)
+        // MouseState.SkillActivateGo retgo = GetComponent<MouseState>().GetSkillActiveGo();
+        MouseState.SkillActivate ret = GetComponent<MouseState>().GetSkillActive();
+        GameObject Invorker = GetComponent<AtachMaster>().GetSkillInvoker();
+        switch(ret)
         {
-            case MouseState.SkillActivateGo.AtTheStart:
-                AtachOject.GetComponent<CharacterStatus>().skill.AtTheStart();
+            case MouseState.SkillActivate.Yes:
+                Invorker.GetComponent<CharacterStatus>().skill.SkillIsActive();
                 break;
-            case MouseState.SkillActivateGo.AtTheEnd:
-                AtachOject.GetComponent<CharacterStatus>().skill.AtTheEnd();
+            case MouseState.SkillActivate.No:
+                GetComponent<Player>().SetState(Player.PlayerStatus.None);
+                GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.None); ;
                 break;
-            case MouseState.SkillActivateGo.BattleStart:
-                AtachOject.GetComponent<CharacterStatus>().skill.BattleStart();
-                break;
-            case MouseState.SkillActivateGo.MoveStart:
-                AtachOject.GetComponent<CharacterStatus>().skill.MoveStart();
-                break;
-            case MouseState.SkillActivateGo.MoveEnd:
-                AtachOject.GetComponent<CharacterStatus>().skill.MoveEnd();
-                break;
-
+                
         }
 
     }

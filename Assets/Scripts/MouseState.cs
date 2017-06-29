@@ -164,8 +164,6 @@ public class MouseState : MonoBehaviour
                             AtachCharObject.transform.position = MovePos;
                             //MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                             MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                            Debug.Log("cococococ");
-                            Debug.Log(AtachCharObject+"aaaaaaa");
                             AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();
                             AtachCharObject = null;
                             //                        status = PlayerStatus.None;
@@ -193,6 +191,7 @@ public class MouseState : MonoBehaviour
                     AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
                 }
                 MovePos = MasterObject.GetComponent<BoardMaster>().GetPos(CopyAttachMassNumber);
+                GameObject GetMass = MasterObject.GetComponent<BoardMaster>().GetMass(CopyAttachMassNumber);
                 MovePos.z = 1.0f;
                 AtachCharObject.transform.position = MovePos;
                 if (RaceNum == 1)//移動するキャラクターがポーンの場合
@@ -201,10 +200,11 @@ public class MouseState : MonoBehaviour
                 }
 
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
-                MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
+                GetComponent<AtachMaster>().SetAttachMassObject(GetMass);
                 AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときのキャラクターのスキル
                 MasterObject.GetComponent<BoardSkillList>().ActiveEnemyMoveEndSkill();//相手の動きが終わったときに発動するスキル
                 MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
+                MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                 AllAtachNull();
                 GetComponent<Player>().SetState(Player.PlayerStatus.None);
                 

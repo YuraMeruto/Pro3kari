@@ -127,7 +127,9 @@ public class CharacterStatus : MonoBehaviour
     }
     public void SetReCovery(int recoverynum)
     {
-
+        CharcterHp += recoverynum;
+        if (MaxHp <= CharcterHp)
+            CharcterHp = MaxHp;
     }
 
     public void SetAttackAdd(int Addnum)

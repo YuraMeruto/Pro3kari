@@ -90,7 +90,7 @@ public class BoardMaster : MonoBehaviour
                 Mass.GetComponent<NumberMass>().SetXArryNumber(side);
                 Mass.GetComponent<NumberMass>().SetYArryNumber(length);
                 MassObj[length, side] = Mass;
-                MassObj[length,side].GetComponent<NumberMass>().SetDefaltNumber(0);
+                MassObj[length, side].GetComponent<NumberMass>().SetDefaltNumber(0);
                 MassNum[length, side] = count;
                 MassStatus[length, side] = Status.None;
                 count++;
@@ -375,6 +375,23 @@ public class BoardMaster : MonoBehaviour
             }
         }
         return vec;
+
+    }
+    public GameObject GetMass(int num)
+    {
+        GameObject targetmass = null;
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if (MassNum[length, side] == num)
+                {
+                    targetmass = MassObj[length, side];
+                }
+
+            }
+        }
+        return targetmass;
 
     }
     public void SetIsMove(int length, int side, bool ret)
@@ -731,8 +748,8 @@ public class BoardMaster : MonoBehaviour
     }
 
     //フォーマルハウト専用のスキル
-    public void SetMassObjAreaChange(ref int lenght,ref int side,GameObject ControlObj)
-        {
+    public void SetMassObjAreaChange(ref int lenght, ref int side, GameObject ControlObj)
+    {
         int num = MassObj[lenght, side].GetComponent<NumberMass>().GetDefaltNumber();
         switch (TurnPlayer)
         {
@@ -762,7 +779,7 @@ public class BoardMaster : MonoBehaviour
                 break;
         }
 
-        }
+    }
     public void ControlObjRelease(GameObject obj)
     {
         Debug.Log(obj);
@@ -770,13 +787,45 @@ public class BoardMaster : MonoBehaviour
         {
             for (int side = 0; side < MaxSide; side++)
             {
-              GameObject resultobj = MassObj[length, side].GetComponent<NumberMass>().GetControlObj();
-                if(resultobj == obj)
+                GameObject resultobj = MassObj[length, side].GetComponent<NumberMass>().GetControlObj();
+                if (resultobj == obj)
                 {
                     MassObj[length, side].GetComponent<NumberMass>().SetControlObj(null);
-                    MassObj[length, side].GetComponent<NumberMass>().SetMaterialDefalt(); 
+                    MassObj[length, side].GetComponent<NumberMass>().SetMaterialDefalt();
                 }
             }
         }
+    }
+
+
+    /// <summary>
+    /// 最初にキングを召喚する
+    /// </summary>
+    /// <param name="playernumber"></param>
+    public void InstanceKing(int playernumber,int directionarynum)
+    {
+        int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
+        int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
+        for (int length = 0; length <= MaxLMap; length++)
+        {
+            for (int side = 0; side <= MaxSMap; side++)
+            {
+                if (FieldSummonData[length, side] == 6)
+                {
+                    if (MassArea[length, side] == playernumber)
+                    {
+                        if (CharObj[length, side] == null)
+                        {
+                            Vector3 Pos = MassObj[length, side].transform.position;
+                            GameObject KingObj = GetComponent<CharacterMaster>().GetSummonsCharacter(directionarynum);
+                            IsMoveMassObj[length, side] = true;
+                            Pos.z += 1;
+                            Instantiate(KingObj, Pos, Quaternion.identity);
+                        }
+                    }
+                }
+            }
+        }
+
     }
 }
