@@ -19,7 +19,7 @@ public class CharacterStatus : MonoBehaviour
     [SerializeField]
     private int SummoningSickness = 0;
     [SerializeField]
-    private int SummonsCost;
+    private int SummonsCost;//召喚コスト
     public SkillBase skill;
     public GameObject skillobj;
     private bool IsFirstMove = true; //ポーン専用
@@ -109,6 +109,7 @@ public class CharacterStatus : MonoBehaviour
     public void SetIsSkill(bool set)
     {
         IsSkill = set;
+        SetIsActiveSkillParticle(set);
     }
 
     public void SetIsSkill()
@@ -167,5 +168,9 @@ public class CharacterStatus : MonoBehaviour
     public int GetDamagePoint()
     {
         return DamagePoint;
+    }
+    public int GetSumonnCost()
+    {
+        return SummonsCost;
     }
 }

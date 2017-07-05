@@ -14,13 +14,7 @@ public class Timegazaer : SkillBase {
     private GameObject PlayerObj;
     [SerializeField]
     private int RecoveryNum;
-    void Start()
-    {
-        Parent = gameObject.transform.parent.gameObject;
-        Master = GameObject.Find("Master");
-        PlayerObj = GameObject.Find("Main Camera");
-        Debug.Log(PlayerObj);
-    }
+
     private int NowMyPosLength;
     private int NowMyPosSide;
     private int MaxLength;
@@ -32,6 +26,15 @@ public class Timegazaer : SkillBase {
 
     [SerializeField]
     private GameObject MoveAreaObj;
+
+    void Start()
+    {
+        Parent = gameObject.transform.parent.gameObject;
+        Master = GameObject.Find("Master");
+        PlayerObj = GameObject.Find("Main Camera");
+        Debug.Log(PlayerObj);
+    }
+
 
     public override void MyTurnStart()
     {

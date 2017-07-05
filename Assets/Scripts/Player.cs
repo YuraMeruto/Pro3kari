@@ -52,6 +52,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject NoObj;
 
+    private bool Is_skill=false;
     private bool IsSkillSwitch = false;
     private float SkillSwitchTime = 0;
     // Use this for initialization
@@ -168,6 +169,7 @@ public class Player : MonoBehaviour
 
                     case PlayerStatus.SkillTargetChoosing:
                         GetComponent<AtachMaster>().SetAttachMassObject(hit.collider.gameObject);
+                        GetComponent<AtachMaster>().SetCopyAttachMassObj(hit.collider.gameObject);
                         GetComponent<MouseState>().SkillTarget();
                         status = PlayerStatus.SkillTargetAlready;
                         break;

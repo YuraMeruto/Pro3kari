@@ -66,6 +66,9 @@ public class BoardMaster : MonoBehaviour
 
     [SerializeField]
     private int MoveCount = 2;
+
+    [SerializeField]
+    private GameObject TimerObj;
     // Use this for initialization
     void Start()
     {
@@ -123,12 +126,12 @@ public class BoardMaster : MonoBehaviour
             MassArea[1, x] = 1;
             MassObj[1, x].GetComponent<NumberMass>().SetPlayerNumber(1);
             MassObj[1, x].GetComponent<NumberMass>().SetDefaltNumber(1);
-            MassArea[7, x] = 2;
-            MassObj[7, x].GetComponent<NumberMass>().SetPlayerNumber(2);
-            MassObj[7, x].GetComponent<NumberMass>().SetDefaltNumber(2);
             MassArea[6, x] = 2;
             MassObj[6, x].GetComponent<NumberMass>().SetPlayerNumber(2);
             MassObj[6, x].GetComponent<NumberMass>().SetDefaltNumber(2);
+            MassArea[7, x] = 2;
+            MassObj[7, x].GetComponent<NumberMass>().SetPlayerNumber(2);
+            MassObj[7, x].GetComponent<NumberMass>().SetDefaltNumber(2);
         }
         MaxNumber = count;
         //デッキの生成開始   
@@ -137,7 +140,7 @@ public class BoardMaster : MonoBehaviour
         GameObject Deck1 = Instantiate(DeckObj, DeckPos, DeckObj.transform.rotation);
         PlayerNumber = 1;
         Deck1.GetComponent<SummonsDeck>().SetPlayerNumber(PlayerNumber);
-        DeckPos = MassObj[7, 7].transform.position;
+        DeckPos = MassObj[5, 5].transform.position;
         DeckPos.x = DeckPos.x + 3;
         GameObject Deck2 = Instantiate(DeckObj, DeckPos, DeckObj.transform.rotation);
         PlayerNumber = 2;
@@ -333,7 +336,6 @@ public class BoardMaster : MonoBehaviour
                     CharObj[length, side] = charobj;
                     GetComponent<BoardSkillList>().SetPosLength(length);
                     GetComponent<BoardSkillList>().SetPosSide(side);
-                    Instantiate(Kari, MassObj[length, side].transform.position, Quaternion.identity);//仮でしています
                 }
 
             }
@@ -667,6 +669,7 @@ public class BoardMaster : MonoBehaviour
 
     public void TurnStart()
     {
+        TimerObj.GetComponent<PlayerTime>().SetTimer();
         TurnStartSkills();
         SubtractionSummoningSicknessCharacterList();
     }
@@ -802,13 +805,13 @@ public class BoardMaster : MonoBehaviour
     /// 最初にキングを召喚する
     /// </summary>
     /// <param name="playernumber"></param>
-    public void InstanceKing(int playernumber,int directionarynum)
+    public void InstanceKing(int playernumber, int directionarynum)
     {
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
-        for (int length = 0; length <= MaxLMap; length++)
+        for (int length = 0; length < MaxLMap; length++)
         {
-            for (int side = 0; side <= MaxSMap; side++)
+            for (int side = 0; side < MaxSMap; side++)
             {
                 if (FieldSummonData[length, side] == 6)
                 {
@@ -820,12 +823,86 @@ public class BoardMaster : MonoBehaviour
                             GameObject KingObj = GetComponent<CharacterMaster>().GetSummonsCharacter(directionarynum);
                             IsMoveMassObj[length, side] = true;
                             Pos.z += 1;
-                            Instantiate(KingObj, Pos, Quaternion.identity);
+                            GameObject InstanceKing = Instantiate(KingObj, Pos, Quaternion.identity);
+                            InstanceKing.GetComponent<MoveData>().ReadSetObj(InstanceKing);
+                            InstanceKing.GetComponent<ReadCsv>().SetTargetObj(InstanceKing);
+                            InstanceKing.GetComponent<MoveData>().IniSet();
+                            CharObj[length, side] = InstanceKing;
+                            MassStatus[length, side] = Status.IsMoveArea;
+                            if (length == 0)
+                                InstanceKing.GetComponent<CharacterStatus>().SetPlayerNumber(1);
+                            else
+                                InstanceKing.GetComponent<CharacterStatus>().SetPlayerNumber(2);
+
                         }
                     }
                 }
             }
         }
 
+    }
+
+    /// <summary>
+    /// サルードのスキルで使用相手の駒を自分の陣地に移動させる
+    /// </summary>
+    /// <param name="pos"></param>
+    public void SarudoSkillPos(Vector3 pos, GameObject obj)
+    {
+        pos.z = 10;
+        SetNullChar(obj);
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if (pos == MassObj[length, side].transform.position)
+                {
+                    obj.transform.position = MassObj[length, side].transform.position;
+                    CharObj[length, side] = obj;
+                    break;
+                }
+
+            }
+
+        }
+    }
+
+    public void SetNullChar(GameObject target)
+    {
+        for (int length = 0; length < MaxLength; length++)
+        {
+            for (int side = 0; side < MaxSide; side++)
+            {
+                if (target == CharObj[length,side])
+                {
+                    CharObj[length, side] = null;
+                    break;
+                }
+            }
+
+        }
+    }
+
+    public bool  UseAp(int playernum,int useapnum)
+    {
+        bool ret;
+      ret = PlayerObj[playernum].GetComponent<AP>().UseAp(useapnum);
+        return ret;
+    }
+
+    public void SetSp(int playenum,int cost)
+    {
+        PlayerObj[playenum].GetComponent<SP>().DestroyList(cost);
+    }
+
+    public bool Is_UseSP(int costnum)
+    {
+        CopyCost = costnum;
+        int NowSP = PlayerObj[TurnPlayer].GetComponent<SP>().GetSP();
+        NowSP -= costnum;
+        if (NowSP -costnum <= 0)
+        {
+            return false;
+        }
+        return true;
     }
 }

@@ -358,12 +358,18 @@ public class MouseState : MonoBehaviour
         GameObject CopyAtachMassObject = GetComponent<AtachMaster>().GetAttachMassObj();
         int AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
         GameObject AtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(AtachMassNumber);
-        int num = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
-        int turnnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        if (num != turnnum)
+        if (AtachCharObject != null) {
+            int num = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
+            int turnnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
+            if (num != turnnum)
+            {
+                Debug.Log("ターゲットセット");
+                GetComponent<AtachMaster>().SetSkillTarget(AtachCharObject);
+            }
+        }
+        else if(AtachCharObject == null)
         {
-            Debug.Log("ターゲットセット");
-            GetComponent<AtachMaster>().SetSkillTarget(AtachCharObject);
+            Debug.Log("nullnullnull");
         }
     }
     /// <summary>

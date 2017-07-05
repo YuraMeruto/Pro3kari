@@ -16,13 +16,11 @@ public class SP : MonoBehaviour
     private GameObject SPPos;
 
     [SerializeField]
-    private int SPMax;
-
-    [SerializeField]
-    private int APStart;
+    private int SPMax;    
     [SerializeField]
     private List<GameObject> SPObjList = new List<GameObject>();
-
+    [SerializeField]
+    private int ApStartNum;
     private int Number;
     public void ResetSP()
     {
@@ -53,10 +51,8 @@ public class SP : MonoBehaviour
             SPCount = CopySP;
             SPCount += 1;
             CopySP = SPCount;
-            if (SPCount >= APStart)
-            {
-                GetComponent<AP>().AddAP();
-            }
+            if (ApStartNum <= SPCount)
+                GetComponent<AP>().AddAp();
         }
     }
 
@@ -84,17 +80,7 @@ public class SP : MonoBehaviour
     {
         SPObjList.Clear();
     }
-    /*
-    public void InstanceSPObj(int num)
-    {
-        Vector3 InstancePos = SPPos.transform.position;
-        for (;num>0;num--)
-        {
-         GameObject ObjName = Instantiate(SPObj,InstancePos,SPObj.transform.rotation);
-            InstancePos.x--;
-        }
-    }
-    */
+    
     public void InstanceSPObj()
     {
         Vector3 InstancePos = SPPos.transform.position;
@@ -115,4 +101,5 @@ public class SP : MonoBehaviour
             Destroy(clone);
         }
     }
+
 }

@@ -4,54 +4,71 @@ using UnityEngine;
 
 public class AP : MonoBehaviour
 {
-
     [SerializeField]
-    private int APCount;
-    private int PlayerNumber;
+    private int MaxAp;
     [SerializeField]
-    private GameObject APObj;
+    private int NowAp = 0;
     [SerializeField]
-    private GameObject APPos;
-
+    private GameObject ApObj;
     [SerializeField]
-    private int MaxAP;
+    private List<GameObject> ApList = new List<GameObject>();
     [SerializeField]
-    private List<GameObject> APList = new List<GameObject>();
-
-    private GameObject InstanceObj;
-    private int CopyCount;
-
-    public void SetAP(int num)
+    private GameObject ApPos;
+    public void AddAp()
     {
-        APCount += num;       
-    }
-    public void AddAP()
-    {
-        APCount++;
-    }
-
-    public void InstanceAP()
-    {
-        Vector3 pos = APPos.transform.position;
-        for (int count = 0;count < APCount;count++)
+            NowAp++;
+        if (NowAp > MaxAp)
         {
-            GameObject ObjName = Instantiate(APObj, pos, APObj.transform.rotation);
-            pos.x--;
-            APList.Add(ObjName);
+            NowAp = MaxAp;
+        }
+        InstanceAp();
+    }
+
+    public bool UseAp(int num)
+    {
+        if (NowAp - num < 0)
+        {
+            return false;
+        }
+        UseApDestroy(num);
+        NowAp -= num;
+        return true;
+    }
+
+    public int GetNowAp()
+    {
+        return NowAp;
+    }
+    public void InstanceAp()
+    {
+        AllDestroy();
+        Vector3 InstancePos = ApPos.transform.position;
+        InstancePos.z = 1;
+        for (int count = 0; count < NowAp; count ++)
+        {
+            GameObject Instance = Instantiate(ApObj,InstancePos,Quaternion.identity);
+            InstancePos.x -= 1.5f;
+            ApList.Add(Instance);
         }
     }
 
-    public void AllDestory()
+    public void AllDestroy()
     {
-        var clones = GameObject.FindGameObjectsWithTag("SPTag");
+        var clones = GameObject.FindGameObjectsWithTag("ApTag");
         foreach (var clone in clones)
         {
             Destroy(clone);
+            ApList.Clear();
         }
     }
 
-    public void ClearList()
+    public void UseApDestroy(int num)
     {
-        APList.Clear();
+        for(int count = ApList.Count-1;num != 0;count--)
+        {
+            Destroy(ApList[count]);
+            ApList.RemoveAt(count);
+            num--;
+        }
     }
 }
