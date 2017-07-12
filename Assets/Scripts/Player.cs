@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing,SkillTargetChoosing,SkillTargetAlready };
+    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing, SkillTargetChoosing, SkillTargetAlready };
     [SerializeField]
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
@@ -52,7 +52,7 @@ public class Player : MonoBehaviour
     [SerializeField]
     private GameObject NoObj;
 
-    private bool Is_skill=false;
+    private bool Is_skill = false;
     private bool IsSkillSwitch = false;
     private float SkillSwitchTime = 0;
     // Use this for initialization
@@ -65,37 +65,10 @@ public class Player : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
-        if (Input.GetKeyDown(KeyCode.S))//デバック用操作
-        {
-            //       MasterObject.GetComponent<BoardMaster>().DebugObj();
-        }
-
         MauseMove();
         IsSkillSwitchAdd();
     }
-    void MauseRay()
-    {
-        /*
-        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-        RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
-        {
-            MassObject = hit.collider.gameObject;
-            if (CopyMassObject == null)
-            {
-                CopyMassObject = MassObject;
-            }
-            else
-            {
-                CopyMassObject = MassObject;
-            }
-            hit.collider.gameObject.GetComponent<Renderer>().material.color = new Color(1, 0, 0, 0);
 
-
-        }
-        */
-    }
     void MauseMove()
     {
         if (Input.GetMouseButtonDown(0))
@@ -185,7 +158,6 @@ public class Player : MonoBehaviour
                     case PlayerStatus.ChoosingCard:
                     case PlayerStatus.ShowCard:
                     case PlayerStatus.None:
-                        //                        AtachDeckObj = hit2.collider.gameObject;
                         GetComponent<AtachMaster>().SetAttachDeckObj(hit2.collider.gameObject);
                         GetComponent<MouseState>().SwitchDeck();
 
@@ -280,6 +252,9 @@ public class Player : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// スキルを使うかの選択
+    /// </summary>
     public void IsSkillZyazi()
     {
         GameObject atachobj = GetComponent<AtachMaster>().GetAttachCharObj();
@@ -316,5 +291,5 @@ public class Player : MonoBehaviour
             Destroy(clone);
         }
     }
-    
+
 }

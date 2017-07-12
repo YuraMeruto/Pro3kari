@@ -44,18 +44,20 @@ public class Sarudo :SkillBase {
                 SetPos();
                 break;
         }
-
     }
 
+    
     public void SarudoSkillActive()
     {
         stage = SkillStage.Target;
         MouseState.SkillActivate retactive = PlayerObj.GetComponent<MouseState>().GetSkillActive();
         switch (retactive)
         {
+            //スキルを発動することの再確認させる
             case MouseState.SkillActivate.Yes:
                 int playernum = Parent.GetComponent<CharacterStatus>().GetPlayerNumber();
-
+                
+                //使用するAPの確認
                 bool ret = Master.GetComponent<BoardMaster>().UseAp(playernum, ApSkillCost);
                 if (ret) { 
                     stage = SkillStage.Target;

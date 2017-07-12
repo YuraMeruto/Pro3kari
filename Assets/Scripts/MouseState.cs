@@ -315,7 +315,6 @@ public class MouseState : MonoBehaviour
             AllIsMoveAreaDestroy();
             AllSummonsCardDestroy();
             AllKariDestroy();
-            //            status = PlayerStatus.None;
             GetComponent<Player>().SetState(Player.PlayerStatus.None);
         }
     }
