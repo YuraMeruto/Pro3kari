@@ -10,6 +10,7 @@ public class PlayerTime : MonoBehaviour
     private float Timer;
     [SerializeField]
     private float SpeedTime;
+    [SerializeField]
     private float CopyTime;
     [SerializeField]
     private bool Is_StopTimer = true;
@@ -25,20 +26,18 @@ public class PlayerTime : MonoBehaviour
         SetTimerThread.Start();
     }
 
-    public void DecreaseTime()
-    {
-    }
 
     void Update()
     {
         if (!Is_StopTimer)
+        {
             Timer -= Time.deltaTime * SpeedTime;
-        TimerText.text = Timer.ToString("00");
+            TimerText.text = Timer.ToString("00");
+        }
         if (Timer <= 0)
         {
             Master.GetComponent<BoardMaster>().SetTurnPlayer();
         }
-
     }
 
 
@@ -49,6 +48,6 @@ public class PlayerTime : MonoBehaviour
     public void SetTimer()
     {
         Timer = CopyTime;
-        SetTimerThread.Abort();
+//        SetTimerThread.Abort();
     }
 }

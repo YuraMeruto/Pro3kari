@@ -4,7 +4,9 @@ using UnityEngine;
 
 public class PhaseMaster : MonoBehaviour {
 
+
     public enum Phase { None, Main1, Move, Main2, TurnEnd };
+    [SerializeField]
     private Phase phase = Phase.Main1;
 
     [SerializeField]

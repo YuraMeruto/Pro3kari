@@ -48,7 +48,6 @@ public class MouseState : MonoBehaviour
             {
                 if (AtachCharObject != null)
                 {
-                    Debug.Log(AtachCharObject.name);
                     int retnum = AtachCharObject.GetComponent<CharacterStatus>().GetSummoningSickness();
                     if (retnum == 0)
                     {
@@ -83,11 +82,9 @@ public class MouseState : MonoBehaviour
                 GetComponent<Player>().SetState(Player.PlayerStatus.None);
                 GetComponent<Player>().IsSkillZyazi();
                 AllIsMoveAreaDestroy();
+                AllKariDestroy();
                 AllSummonsCardDestroy();
-                if (AtachDeckObj != null)
-                {
-                    AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                }
+
             }
         }
         if (IsSamePlayerCharObj)
@@ -106,7 +103,7 @@ public class MouseState : MonoBehaviour
                     IsEnemyObj = null;
                 }
                 GetComponent<AtachMaster>().SetEnemyObj(IsEnemyObj);
-              
+
                 if (!IsTargetBool)
                 {
                     var BattleRet = GetComponent<BattleScene>().Result();
@@ -119,10 +116,7 @@ public class MouseState : MonoBehaviour
                             Destroy(IsEnemyObj);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
-                            if (AtachDeckObj != null)
-                            {
-                                AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                            }
+
                             MovePos.z = 1.0f;
                             AtachCharObject.transform.position = MovePos;
                             MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
@@ -140,10 +134,7 @@ public class MouseState : MonoBehaviour
                             Destroy(AtachCharObject);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
-                            if (AtachDeckObj != null)
-                            {
-                                AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                            }
+
                             MasterObject.GetComponent<BoardMaster>().SetLoseObj(AtachCharObject, AtachMassNumber);
                             MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                             AtachCharObject = null;
@@ -156,13 +147,9 @@ public class MouseState : MonoBehaviour
                             MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
-                            if (AtachDeckObj != null)
-                            {
-                                AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                            }
+
                             MovePos.z = 1.0f;
                             AtachCharObject.transform.position = MovePos;
-                            //MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                             MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                             AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();
                             AtachCharObject = null;
@@ -186,10 +173,7 @@ public class MouseState : MonoBehaviour
                 MasterObject.GetComponent<BoardList>().SetMoveList(AtachCharObject);
                 AllIsMoveAreaDestroy();
                 AllSummonsCardDestroy();
-                if (AtachDeckObj != null)
-                {
-                    AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-                }
+
                 MovePos = MasterObject.GetComponent<BoardMaster>().GetPos(CopyAttachMassNumber);
                 GameObject GetMass = MasterObject.GetComponent<BoardMaster>().GetMass(CopyAttachMassNumber);
                 MovePos.z = 1.0f;
@@ -205,12 +189,11 @@ public class MouseState : MonoBehaviour
                 MasterObject.GetComponent<BoardSkillList>().ActiveEnemyMoveEndSkill();//相手の動きが終わったときに発動するスキル
                 MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-                AllAtachNull();
                 GetComponent<Player>().SetState(Player.PlayerStatus.None);
-                
+
             }
         }
-        AllAtachNull();
+
         AllIsMoveAreaDestroy();
     }
 
@@ -224,49 +207,31 @@ public class MouseState : MonoBehaviour
     }
     public void AllSummonsCardDestroy()//移動範囲の表示のオブジェクトをすべて消す
     {
-        var clones = GameObject.FindGameObjectsWithTag("SummonsCard");
-        foreach (var clone in clones)
-        {
-            Destroy(clone);
-        }
+        GameObject AtachDeckCard = GetComponent<AtachMaster>().GetAttachChoosingCardObj();
     }
 
-    public void AllAtachNull()
-    {
-        //AtachCharObject = null;
-        //CopyAtachMassObject = null;
-        //AtachDeckObj = null;
-    }
 
-    public void SwitchDeck()//デッキのカードを開くか開かないか
+
+    public void SwitchDeck()//デッキからドローする
     {
+        int nowrurn = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
         GameObject AtachDeckObj = GetComponent<AtachMaster>().GetAttachDeckObj();
-        bool IsOpen = AtachDeckObj.GetComponent<SummonsDeck>().GetISCardShow();
-        if (IsOpen)
+        int AtachDeckObjNum = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
+        if (nowrurn != AtachDeckObjNum)
+            return;
+        bool DrawRet = MasterObject.GetComponent<BoardMaster>().IsDrawCard();
+        if (DrawRet)
         {
-            int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-            int DeckNumber = AtachDeckObj.GetComponent<SummonsDeck>().GetPlayerNumber();
-            if (MasterTurnNumber == DeckNumber)
-            {
-                AtachDeckObj.GetComponent<SummonsDeck>().ShowCard();
-                //                status = PlayerStatus.ShowCard;
-                GetComponent<Player>().SetState(Player.PlayerStatus.ShowCard);
-            }
+            GameObject DrawObj = AtachDeckObj.GetComponent<SummonsDeck>().GetReadDeckDataObjList();
+            MasterObject.GetComponent<BoardMaster>().AddDrawcard(DrawObj);
+            Debug.Log(DrawObj + "を引きました");
         }
-        else
-        {
-            //            status = PlayerStatus.None;
-            GetComponent<Player>().SetState(Player.PlayerStatus.None);
-            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-            AllIsMoveAreaDestroy();
-            AllSummonsCardDestroy();
-            AllKariDestroy();
-        }
+
     }//デッキを選択したら
 
     public void ChoosingCard()//カードを選択したら
     {
-        GameObject AtachDeckCardObj = GetComponent<AtachMaster>().GetAttachDeckCardObj();
+        GameObject AtachDeckCardObj = GetComponent<AtachMaster>().GetAttachChoosingCardObj();
         PhaseMaster.Phase NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
         int DictionaryNum;
         Debug.Log("これはカードです");
@@ -275,13 +240,14 @@ public class MouseState : MonoBehaviour
             return;
         }
         int MasterTurnNumber = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
-        RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceNumber();
+        RaceNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetRaceSummonNumber();
         SumonsCost = AtachDeckCardObj.GetComponent<IllustrationCard>().GetSumonCos();
         DictionaryNum = AtachDeckCardObj.GetComponent<IllustrationCard>().GetDictionaryNumber();
         MasterObject.GetComponent<BoardMaster>().SummonsFiledPos(RaceNum);
         GameObject ChoosingCardSummonObj;
         ChoosingCardSummonObj = MasterObject.GetComponent<CharacterMaster>().GetSummonsCharacter(DictionaryNum);
         GetComponent<AtachMaster>().SetChoosingCardSummonObj(ChoosingCardSummonObj);
+        GetComponent<Player>().SetState(Player.PlayerStatus.ChoosingCard);
     }
 
     public void SummonCard()
@@ -292,31 +258,46 @@ public class MouseState : MonoBehaviour
         bool retIsmove = MasterObject.GetComponent<BoardMaster>().GetIsMove(AtachMassNumber);
         bool retIsSPCost = MasterObject.GetComponent<BoardMaster>().UseSP(SumonsCost);
         GameObject ChoosingCardSummonObj = GetComponent<AtachMaster>().GetChoosingCardSummonObj();
-        if (retIsmove && retIsSPCost)
+        if (ChoosingCardSummonObj == null)
+            return;
+        PhaseMaster.Phase NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
+        switch (NowPhase)
         {
-            MasterObject.GetComponent<BoardMaster>().SPDestroyCall();
-            Debug.Log("召喚!");
-            Vector3 SumonsPos = AtachMassObject.transform.position;
-            SumonsPos.z += 1;
-            GameObject InstanceSumonObj = Instantiate(ChoosingCardSummonObj, SumonsPos, ChoosingCardSummonObj.transform.rotation);
-            int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
-            MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
-            MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
-            GameObject AtachDeckObj = GetComponent<AtachMaster>().GetAttachDeckObj();
-            AtachDeckObj.GetComponent<SummonsDeck>().SetIsCardShow();
-            if (RaceNum != 1)//ポーン以外の召喚酔い
-            {
-                InstanceSumonObj.GetComponent<CharacterStatus>().SetSummoningSickness(1);
-                MasterObject.GetComponent<BoardMaster>().SetSummoningSicknessCharacterList(InstanceSumonObj);
-            }
-            GetComponent<AtachMaster>().SetInstanceSumonObj(InstanceSumonObj);
-            MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
-            SetIniSummonCard();
-            AllIsMoveAreaDestroy();
-            AllSummonsCardDestroy();
-            AllKariDestroy();
-            GetComponent<Player>().SetState(Player.PlayerStatus.None);
+            case PhaseMaster.Phase.Main1:
+            case PhaseMaster.Phase.Main2:
+                if (retIsmove && retIsSPCost)
+                {
+                    MasterObject.GetComponent<BoardMaster>().SPDestroyCall();
+                    Debug.Log("召喚!");
+                    Vector3 SumonsPos = AtachMassObject.transform.position;
+                    SumonsPos.z += 1;
+                    GameObject InstanceSumonObj = Instantiate(ChoosingCardSummonObj, SumonsPos, ChoosingCardSummonObj.transform.rotation);
+                    int MassNum = AtachMassObject.GetComponent<NumberMass>().GetNumber();
+                    MasterObject.GetComponent<BoardMaster>().SetIsCharObj(MassNum, InstanceSumonObj);
+                    MasterObject.GetComponent<BoardMaster>().SetStatusIsMoveArea(MassNum);
+                    GameObject AtachDeckObj = GetComponent<AtachMaster>().GetAttachDeckObj();
+                    if (RaceNum != 1)//ポーン以外の召喚酔い
+                    {
+                        InstanceSumonObj.GetComponent<CharacterStatus>().SetSummoningSickness(1);
+                        MasterObject.GetComponent<BoardMaster>().SetSummoningSicknessCharacterList(InstanceSumonObj);
+                    }
+                    GetComponent<AtachMaster>().SetInstanceSumonObj(InstanceSumonObj);
+                    MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
+                    SetIniSummonCard();
+                    AllIsMoveAreaDestroy();
+                    AllSummonsCardDestroy();
+                    AllKariDestroy();
+                    GetComponent<Player>().SetState(Player.PlayerStatus.None);
+                }
+                else if(!retIsSPCost){
+                    Debug.Log("SPが足りません");
+                    AllKariDestroy();
+                    return;
+                }
+                break;
         }
+        GameObject PoPCard = GetComponent<Player>().GetPopCard();
+        MasterObject.GetComponent<BoardMaster>().PopYourCard(PoPCard);
     }
 
     public void AllKariDestroy()
@@ -357,7 +338,8 @@ public class MouseState : MonoBehaviour
         GameObject CopyAtachMassObject = GetComponent<AtachMaster>().GetAttachMassObj();
         int AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
         GameObject AtachCharObject = MasterObject.GetComponent<BoardMaster>().GetCharObject(AtachMassNumber);
-        if (AtachCharObject != null) {
+        if (AtachCharObject != null)
+        {
             int num = AtachCharObject.GetComponent<CharacterStatus>().GetPlayerNumber();
             int turnnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
             if (num != turnnum)
@@ -366,7 +348,7 @@ public class MouseState : MonoBehaviour
                 GetComponent<AtachMaster>().SetSkillTarget(AtachCharObject);
             }
         }
-        else if(AtachCharObject == null)
+        else if (AtachCharObject == null)
         {
             Debug.Log("nullnullnull");
         }
@@ -395,7 +377,7 @@ public class MouseState : MonoBehaviour
             case SkillActivate.No:
                 skillactive = SkillActivate.None;
                 return true;
-                
+
             case SkillActivate.None:
                 break;
         }

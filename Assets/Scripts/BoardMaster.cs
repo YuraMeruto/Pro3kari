@@ -30,6 +30,8 @@ public class BoardMaster : MonoBehaviour
     [SerializeField]
     private int MaxSide;
 
+    [SerializeField]
+    GameObject CameraObj;
     private int CopyCost;
     private int MaxNumber;
     [SerializeField]
@@ -69,6 +71,9 @@ public class BoardMaster : MonoBehaviour
 
     [SerializeField]
     private GameObject TimerObj;
+    [SerializeField]
+    private int IniDrawaCount;
+    private GameObject[] DeckObjs = new GameObject[2];
     // Use this for initialization
     void Start()
     {
@@ -126,12 +131,12 @@ public class BoardMaster : MonoBehaviour
             MassArea[1, x] = 1;
             MassObj[1, x].GetComponent<NumberMass>().SetPlayerNumber(1);
             MassObj[1, x].GetComponent<NumberMass>().SetDefaltNumber(1);
-            MassArea[6, x] = 2;
-            MassObj[6, x].GetComponent<NumberMass>().SetPlayerNumber(2);
-            MassObj[6, x].GetComponent<NumberMass>().SetDefaltNumber(2);
-            MassArea[7, x] = 2;
-            MassObj[7, x].GetComponent<NumberMass>().SetPlayerNumber(2);
-            MassObj[7, x].GetComponent<NumberMass>().SetDefaltNumber(2);
+            MassArea[4, x] = 2;
+            MassObj[4, x].GetComponent<NumberMass>().SetPlayerNumber(2);
+            MassObj[4, x].GetComponent<NumberMass>().SetDefaltNumber(2);
+            MassArea[5, x] = 2;
+            MassObj[5, x].GetComponent<NumberMass>().SetPlayerNumber(2);
+            MassObj[5, x].GetComponent<NumberMass>().SetDefaltNumber(2);
         }
         MaxNumber = count;
         //デッキの生成開始   
@@ -140,18 +145,32 @@ public class BoardMaster : MonoBehaviour
         GameObject Deck1 = Instantiate(DeckObj, DeckPos, DeckObj.transform.rotation);
         PlayerNumber = 1;
         Deck1.GetComponent<SummonsDeck>().SetPlayerNumber(PlayerNumber);
+        DeckObjs[0] = Deck1;
         DeckPos = MassObj[5, 5].transform.position;
         DeckPos.x = DeckPos.x + 3;
         GameObject Deck2 = Instantiate(DeckObj, DeckPos, DeckObj.transform.rotation);
         PlayerNumber = 2;
         Deck2.GetComponent<SummonsDeck>().SetPlayerNumber(PlayerNumber);
+        DeckObjs[1] = Deck2;
         //デッキ生成終了
 
         //SP設定
         PlayerObj[TurnPlayer].GetComponent<SP>().InstanceSPObj();
+        IniStartSetting();
+    }
+    void IniStartSetting()
+    { 
         SetTurnPlayer();
     }
+    public void IniDrawCard(int playernum)
+    {
 
+        for (int count = 0; count < IniDrawaCount; count++)
+        {
+            GameObject drawobj = DeckObjs[playernum - 1].GetComponent<SummonsDeck>().GetReadDeckDataObjList();
+            PlayerObj[playernum].GetComponent<YourCard>().SetDrawCards(drawobj);
+        }
+    }
     public int GetMaxNumber()
     {
         return MaxNumber;
@@ -539,39 +558,21 @@ public class BoardMaster : MonoBehaviour
     {
         int num = MassNum[length, side];
         Vector3 pos = MassObj[length, side].transform.position;
-        //  Instantiate(Kari, MassObj[length, side].transform.position,Quaternion.identity);
+
         return num;
     }
 
-    /// <summary>
-    /// デバック用
-    /// </summary>
-    /// <param name="obj"></param>
-    public void AllInstance(GameObject obj)
-    {
-        for (int length = 0; length < MaxLength - 1; length++)
-        {
-            for (int side = 0; side < MaxSide - 1; side++)
-            {
-                if (CharObj[length, side] != null)//移動先のマスのナンバーを索敵(エネミーのマスの場所を索敵)
-                {
-                    //          Vector3 ppp = CharObj[length, side].transform.position;
-                    //            ppp.y = 2.0f;
-                    //          GameObject a = Instantiate(obj,ppp,Quaternion.identity);
-                    //            a.name = "test";
-                }
-            }
-        }
 
-    }
     /// <summary>
     /// デッキから選択されたカードをタッチして召喚できる場所を表示させる
     /// </summary>
     /// <param name="num"></param>
     public void SummonsFiledPos(int num)
     {
+        Debug.Log(num+"です");
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
+        int instancecount = 0;
         for (int length = 0; length <= MaxLMap; length++)
         {
             for (int side = 0; side <= MaxSMap; side++)
@@ -586,11 +587,14 @@ public class BoardMaster : MonoBehaviour
                             IsMoveMassObj[length, side] = true;
                             Pos.z += 1;
                             Instantiate(Kari, Pos, Quaternion.identity);
+                            instancecount++;
                         }
                     }
                 }
             }
         }
+        if (instancecount == 0)
+            CameraObj.GetComponent<AtachMaster>().SetChoosingCardSummonObj(null);
     }
 
     /// <summary>
@@ -602,7 +606,6 @@ public class BoardMaster : MonoBehaviour
     public void SetSummonsPosData(int num, int length, int side)
     {
         FieldSummonData[side, length] = num;
-
     }
 
 
@@ -669,9 +672,11 @@ public class BoardMaster : MonoBehaviour
 
     public void TurnStart()
     {
-        TimerObj.GetComponent<PlayerTime>().SetTimer();
         TurnStartSkills();
         SubtractionSummoningSicknessCharacterList();
+        GetComponent<IsAttachObj>().SetIsAtachObj(false);
+        PlayerObj[TurnPlayer].GetComponent<YourCard>().SetIsDrawCard(true);
+        TimerObj.GetComponent<PlayerTime>().SetIs_StopTimer(false);
     }
 
     public void SPDestroyCall()
@@ -680,12 +685,6 @@ public class BoardMaster : MonoBehaviour
     }
 
 
-
-    public void CharacterTurnStartSkill()
-    {
-
-    }
-
     public void MoveCountSubtraction()
     {
         MoveCount--;
@@ -693,14 +692,16 @@ public class BoardMaster : MonoBehaviour
         {
             GetComponent<PhaseMaster>().NextFase();
             MoveCount = 2;
-            //    SetTurnPlayer();
         }
     }
-
+    
     void TurnEnd()
     {
         TurnEndSkills();
         GetComponent<BoardList>().ClearMoveList();
+        TimerObj.GetComponent<PlayerTime>().SetIs_StopTimer(true);
+        TimerObj.GetComponent<PlayerTime>().SetTimer();
+        
     }
 
     public void SetSummonCharacters(GameObject SetObj)
@@ -809,12 +810,12 @@ public class BoardMaster : MonoBehaviour
     {
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
-        for (int length = 0; length < MaxLMap; length++)
+        for (int length = 0; length <= MaxLMap; length++)
         {
-            for (int side = 0; side < MaxSMap; side++)
+            for (int side = 0; side <= MaxSMap; side++)
             {
                 if (FieldSummonData[length, side] == 6)
-                {
+                    {
                     if (MassArea[length, side] == playernumber)
                     {
                         if (CharObj[length, side] == null)
@@ -905,4 +906,23 @@ public class BoardMaster : MonoBehaviour
         }
         return true;
     }
+
+    public bool IsDrawCard()
+    {
+       bool ret = PlayerObj[TurnPlayer].GetComponent<YourCard>().GetIsDrawCard();
+        return ret;
+    }
+
+    public void AddDrawcard(GameObject drawobj)
+    {
+        PlayerObj[TurnPlayer].GetComponent<YourCard>().SetDrawCards(drawobj);
+        PlayerObj[TurnPlayer].GetComponent<YourCard>().SetIsDrawCard(false);
+        GetComponent<IsAttachObj>().SetIsAtachObj(true);
+    }
+    public void PopYourCard(GameObject pop_obj)
+    {
+        Debug.Log(TurnPlayer);
+        PlayerObj[TurnPlayer].GetComponent<YourCard>().PopCard(pop_obj);
+    }
+
 }

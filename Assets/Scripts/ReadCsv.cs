@@ -91,13 +91,13 @@ public class ReadCsv : MonoBehaviour
     {
         FileName = filename;
         TargetObj = targetobj;
-        Debug.Log(FileName + ".csv");
+
         int countx = 0;
         int countz = 0;
         int copyx = 0;
         int copyz = 0;
-        StreamReader sr = new StreamReader(Application.dataPath + "/" + FileName + ".csv", Encoding.GetEncoding("Shift_JIS"));
-
+        TextAsset data = Resources.Load(FileName) as TextAsset;
+        StringReader sr = new StringReader(data.text);
         while (sr.Peek() >= 0)
         {
             string[] cols = sr.ReadLine().Split(',');

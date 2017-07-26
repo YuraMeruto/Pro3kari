@@ -32,55 +32,26 @@ public class Solario : SkillBase
     [SerializeField]
     private GameObject MoveAreaObj;
 
-    public override void MyTurnStart()
-    {
-
-    }
-
-    public override void MyTurnEnd()
-    {
-
-    }
-
-    public override void EnemyTurnStart()
-    {
-    }
-
-    public override void EnemyTurnEnd()
-    {
-
-    }
-    public override void AtTheStart()
-    {
-
-    }
-    public override void AtTheEnd()
-    {
-    }
-    public override void BattleStart()
-    {
-
-    }
     public override void BattleEnd()
     {
         RecoveryMoveSkill();
     }
 
-    public override void MoveStart()
-    {
-       // RecoveryMoveSkill();
 
-    }
     public override void MoveEnd()
     {
+        if (SkillCount <= 0)
+            return;
         MouseState.SkillActivateGo a = PlayerObj.GetComponent<MouseState>().GetSkillActiveGo();
         if (a != MouseState.SkillActivateGo.MoveEnd)
         {
+            PlayerObj.GetComponent<AtachMaster>().SetSkillInvoker(Parent);
+            GameObject hoge = PlayerObj.GetComponent<AtachMaster>().GetSkillInvoker();
+            Debug.Log(hoge + "を取得しました");
             PlayerObj.GetComponent<MouseState>().SetSkillActiveGo(MouseState.SkillActivateGo.MoveEnd);
             PlayerObj.GetComponent<Player>().SetActiveYesNoObjTrue();
             return;
         }
-       RecoveryMoveSkill();
     }
     public override void EnemyMoveEnd()
     {
@@ -91,22 +62,16 @@ public class Solario : SkillBase
     }
     public override void SkillIsActive()
     {
-
+        RecoveryMoveSkill();
     }
+
     public void RecoveryMoveSkill()
     {
-        bool IsGetSkill = Parent.GetComponent<CharacterStatus>().GetIsSkill();
-        if (!IsGetSkill)
-        {
-            return;
-        }
+
         MouseState.SkillActivate retactive = PlayerObj.GetComponent<MouseState>().GetSkillActive();
         if (SkillCount <= 0)
             return;
-        
-        switch (retactive)
-        {
-            case MouseState.SkillActivate.Yes:
+
                 Debug.Log("ソラリオスキル発動");
                 Parent.GetComponent<CharacterStatus>().SetIsActiveSkillParticle(false);
                 Master.GetComponent<BoardList>().RemoveMoveList(Parent);
@@ -115,12 +80,6 @@ public class Solario : SkillBase
                 PlayerObj.GetComponent<Player>().SetActiveYesNoObjFalse();
                 PlayerObj.GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.None);
                 PlayerObj.GetComponent<MouseState>().SetSkillActiveGo(MouseState.SkillActivateGo.None);
-                break;
 
-            case MouseState.SkillActivate.None:
-                PlayerObj.GetComponent<MouseState>().SetSkillActive(MouseState.SkillActivate.Choosing);
-                PlayerObj.GetComponent<Player>().SetActiveYesNoObjTrue();
-                break;
-        }
     }
 }

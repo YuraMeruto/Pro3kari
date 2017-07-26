@@ -19,17 +19,17 @@ public class SummonsPosData : MonoBehaviour {
         int countz = 0;
         int copyx = 0;
         int copyz = 0;
-        StreamReader sr = new StreamReader(Application.dataPath + "/" + "SummonsPosData.csv", Encoding.GetEncoding("Shift_JIS"));
-        while (sr.Peek() >= 0)
+       TextAsset data = Resources.Load("SummonsPosData")as TextAsset;
+        Debug.Log(data);
+        StringReader sr = new StringReader(data.text);
+        while (sr.Peek() > -1)
         {
             string[] cols = sr.ReadLine().Split(',');
             //    Debug.Log(cols.Length);
             foreach (string col in cols)
             {
+                Debug.Log("a");
                 IntData[countx, countz] = int.Parse(col);
-                //Debug.Log("xは;"+countx);
-                //Debug.Log("zは;" + countz);
-                //Debug.Log("合計は;" + IntData[countx,countz]);
                 countx++;
             }
             copyz = countz;
@@ -38,7 +38,7 @@ public class SummonsPosData : MonoBehaviour {
             countz++;
         }
 
-        MaxSideSize = copyx - 1;
+        MaxSideSize = copyx;
         MaxLengthSize = copyz;
 
         for (int length = 0;length <= MaxLengthSize;length++)

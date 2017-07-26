@@ -21,7 +21,7 @@ public class Player : MonoBehaviour
     private int AtachMassNumber;
     private int CopyAttachMassNumber;
     private GameObject MasterObject;
-    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing, SkillTargetChoosing, SkillTargetAlready };
+    public enum PlayerStatus { None, Choose, ShowCard, ChoosingCard, SummonCard, Skillactivate, SkillChoosing, SkillTargetChoosing, SkillTargetAlready,DrawCard };
     [SerializeField]
     private PlayerStatus status = PlayerStatus.None;
     [SerializeField]
@@ -51,10 +51,16 @@ public class Player : MonoBehaviour
     private GameObject YesObj;
     [SerializeField]
     private GameObject NoObj;
-
     private bool Is_skill = false;
     private bool IsSkillSwitch = false;
     private float SkillSwitchTime = 0;
+    [SerializeField]
+    private bool IsAtachCard = false;
+    private float IsAtachCardTime = 1;
+    [SerializeField]
+    private GameObject PopCard = null;
+    [SerializeField]
+    private LayerMask ResetMask;
     // Use this for initialization
     void Start()
     {
@@ -67,6 +73,15 @@ public class Player : MonoBehaviour
     {
         MauseMove();
         IsSkillSwitchAdd();
+        if (!IsAtachCard)
+        {
+            IsAtachCardTime -= Time.deltaTime;
+            if (IsAtachCardTime <= 0)
+            {
+                IsAtachCardTime = 1;
+                IsAtachCard = true;
+            }
+        }
     }
 
     void MauseMove()
@@ -80,9 +95,17 @@ public class Player : MonoBehaviour
 
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, NextPhaseLayer))
             {
+                bool ret = IsAttachObjResult();
+                if (!ret)
+                    return;
+
                 Debug.Log("次のフェイズへ移行します");
+                int nowturn = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
                 MasterObject.GetComponent<PhaseMaster>().NextFase();
+                GetComponent<MouseState>().AllKariDestroy();
+                status = PlayerStatus.None;
                 NowPhase = MasterObject.GetComponent<PhaseMaster>().GetNowFase();
+                
             }
 
             else if (Physics.Raycast(ray, out hit, Mathf.Infinity, YesLayer))
@@ -103,9 +126,21 @@ public class Player : MonoBehaviour
             else if (Physics.Raycast(ray, out hit, Mathf.Infinity, TurnObjLayer))
             {
                 Debug.Log("これはターン修了のオブジェクトです。");
+                bool ret = IsAttachObjResult();
+                if (!ret)
+                    return;
+                if (status == PlayerStatus.DrawCard)
+                {
+                    return;
+                }
+                status = PlayerStatus.None;
                 MasterObject.GetComponent<PhaseMaster>().SetFase(PhaseMaster.Phase.TurnEnd);
+                GetComponent<MouseState>().AllKariDestroy();
             }
-
+            else if(Physics.Raycast(ray, out hit, Mathf.Infinity, ResetMask))
+            {
+                UnityEngine.SceneManagement.SceneManager.LoadScene("Main");
+            }
             else if (Physics.Raycast(ray, out hit, Mathf.Infinity, MassLayer))
             {
                 Debug.Log("オブジェクトです");
@@ -138,6 +173,8 @@ public class Player : MonoBehaviour
                         }
                         //AtachMassNumber = AtachMassObject.GetComponent<NumberMass>().GetNumber();
                         GetComponent<MouseState>().SummonCard();
+                        GetComponent<AtachMaster>().SetChoosingCardObj(null);
+                        IsAtachCard = false;
                         break;
 
                     case PlayerStatus.SkillTargetChoosing:
@@ -155,14 +192,14 @@ public class Player : MonoBehaviour
                 Debug.Log("これはデッキです");
                 switch (status)
                 {
-                    case PlayerStatus.ChoosingCard:
-                    case PlayerStatus.ShowCard:
+
                     case PlayerStatus.None:
                         GetComponent<AtachMaster>().SetAttachDeckObj(hit2.collider.gameObject);
                         GetComponent<MouseState>().SwitchDeck();
 
                         break;
                 }
+
             }
 
             //カードをアタッチしたら
@@ -172,16 +209,25 @@ public class Player : MonoBehaviour
 
                 switch (status)
                 {
-                    case PlayerStatus.ShowCard:
-                        //  AtachDeckCardObj = hit2d.collider.gameObject;
-                        GetComponent<AtachMaster>().SetAttachDeckCardObj(hit2d.collider.gameObject);
+                    case PlayerStatus.ChoosingCard:
+                    case PlayerStatus.None:
+                        bool ret = IsAttachObjResult();
+                        if (!ret)
+                            return;
+                        if (!IsAtachCard)
+                            return;
+
+                        GetComponent<MouseState>().AllKariDestroy();
+                        PopCard = hit2d.collider.gameObject;
+                        IsAtachCard = false;
+                        GetComponent<AtachMaster>().SetChoosingCardObj(hit2d.collider.gameObject);
                         GetComponent<MouseState>().ChoosingCard();
-                        status = PlayerStatus.ChoosingCard;
                         break;
                 }
             }
             IsSkillSwitch = true;
         }
+
         else if (Input.GetMouseButtonUp(0))//マウスのクリックが離されたとき
         {
             Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
@@ -292,4 +338,13 @@ public class Player : MonoBehaviour
         }
     }
 
+    public GameObject GetPopCard()
+    {
+        return PopCard;
+    }
+    bool IsAttachObjResult()
+    {
+        bool ret = MasterObject.GetComponent<IsAttachObj>().GetIsAtachObj();
+        return ret;
+    }
 }

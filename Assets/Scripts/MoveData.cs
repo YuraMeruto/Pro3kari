@@ -155,6 +155,7 @@ public class MoveData : MonoBehaviour
 
                         if (IsCharObj != null)
                         {
+                            Debug.Log(IsCharObj);
                             int IsCharNumber = IsCharObj.GetComponent<CharacterStatus>().GetPlayerNumber();
                             int MyNumber = this.gameObject.GetComponent<CharacterStatus>().GetPlayerNumber();
                             if (MyNumber != IsCharNumber)
@@ -214,6 +215,7 @@ public class MoveData : MonoBehaviour
                             }
 
                         }
+                        Debug.Log(ret);
                         if (ret)//移動できるマスであれば
                         {
                             Vector3 InstancePos = Master.GetComponent<BoardMaster>().MassObj[NowMyPosz + KariZ, NowMyPosx + KariX].transform.position;

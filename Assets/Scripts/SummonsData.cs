@@ -16,7 +16,8 @@ public class SummonsData : MonoBehaviour {
     {
         int countx = 0;
         int countz = 0;
-        StreamReader sr = new StreamReader(Application.dataPath + "/" + "PlayerDeck1.csv", Encoding.GetEncoding("Shift_JIS"));
+        TextAsset data = Resources.Load("PlayerDeck1") as TextAsset;
+        StringReader sr = new StringReader(data.text);
         while (sr.Peek() >= 0)
         {
             countx = 0;
