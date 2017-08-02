@@ -4,7 +4,8 @@ using UnityEngine;
 
 public class NumberMass : MonoBehaviour
 {
-
+    private int Posside;
+    private int Poslength;
     [SerializeField]
     private int Number;
     private bool IsPossibleMoveArea = false;
@@ -124,7 +125,19 @@ public class NumberMass : MonoBehaviour
     {
         return DefaltMaterialNumber;
     }
-
+    public int GetPosSide()
+    {
+        return Posside;
+    }
+    public int GetPosLength()
+    {
+        return Poslength;
+    }
+    public void SetPosSideLength(int length,int side)
+    {
+        Poslength = length;
+        Posside = side;
+    }
     //フォーマルハウトのスキルで使用
     public void SetControlObj(GameObject setobj)
     {

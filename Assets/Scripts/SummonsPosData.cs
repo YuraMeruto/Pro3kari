@@ -20,7 +20,6 @@ public class SummonsPosData : MonoBehaviour {
         int copyx = 0;
         int copyz = 0;
        TextAsset data = Resources.Load("SummonsPosData")as TextAsset;
-        Debug.Log(data);
         StringReader sr = new StringReader(data.text);
         while (sr.Peek() > -1)
         {
@@ -28,7 +27,6 @@ public class SummonsPosData : MonoBehaviour {
             //    Debug.Log(cols.Length);
             foreach (string col in cols)
             {
-                Debug.Log("a");
                 IntData[countx, countz] = int.Parse(col);
                 countx++;
             }

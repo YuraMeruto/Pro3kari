@@ -29,9 +29,7 @@ public class BattleScene : MonoBehaviour
             if (ResultHp <= 0)//プレイヤーからの攻撃
             {
                
-                //Destroy(IsEnemyObj);
                 Debug.Log("勝利しました");
-
                 return BattleResult.Win;
             }
 

@@ -37,13 +37,7 @@ public class CharacterStatus : MonoBehaviour
     {
         MaxHp = CharcterHp;
         Master = GameObject.Find("Master");
-        for (int x = 0; x < 10; x++)
-        {
-            for (int z = 0; z < 10; z++)
-            {
-                MoveData[x, z] = GetComponent<ReadCsv>().InputMoveData(x, z);
-            }
-        }
+
     }
 
     // Update is called once per frame
@@ -103,7 +97,6 @@ public class CharacterStatus : MonoBehaviour
     public void SetIsFirst()
     {
         IsFirstMove = false;
-        GetComponent<MoveData>().SetMoveData();
     }
 
     public void SetIsSkill(bool set)

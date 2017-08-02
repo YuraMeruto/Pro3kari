@@ -95,6 +95,7 @@ public class BoardMaster : MonoBehaviour
                 Mass.name = count.ToString();
                 IsMoveMassObj[length, side] = false;
                 Mass.GetComponent<NumberMass>().SetNumber(count);
+                Mass.GetComponent<NumberMass>().SetPosSideLength(length,side);
                 Mass.GetComponent<NumberMass>().SetXArryNumber(side);
                 Mass.GetComponent<NumberMass>().SetYArryNumber(length);
                 MassObj[length, side] = Mass;
@@ -380,7 +381,10 @@ public class BoardMaster : MonoBehaviour
         }
 
     }
-
+    public GameObject GetMass(int length,int side)
+    {
+        return MassObj[length,side];
+    }
     public Vector3 GetPos(int num)
     {
         Vector3 vec = Vector3.zero;
@@ -458,6 +462,92 @@ public class BoardMaster : MonoBehaviour
         return TurnPlayer;
     }
 
+
+
+    public Vector3 EnemySuurrondings2(int EnemyMassNum,int AtachMassNum,GameObject AtachCharObject)
+    {
+        Vector3 vec = Vector3.zero;
+        int EnemyLength = 0;
+        int EnemySide = 0;
+        ResearchEnemyMassNumber(EnemyMassNum,ref EnemyLength,ref EnemySide);
+        vec = EnemyArround(EnemyLength,EnemySide, AtachCharObject);
+        return vec;
+    }
+    void ResearchEnemyMassNumber(int enemynum,ref int enemylength,ref int enemyside)
+    {
+        for(int length =0;length < 6;length++)
+        {
+            for(int side = 0; side < 6; side++)
+            {
+                int massnun = MassObj[length, side].GetComponent<NumberMass>().GetNumber();
+                if(massnun == enemynum)
+                {
+                    enemylength = length;
+                    enemyside = side;
+                    return;
+                }
+            }
+        }
+    }
+    Vector3 EnemyArround(int enemylength,int enemyside,GameObject playerObj)
+    {
+        for(int length =-1;length<=1;length++)
+        {
+            for(int side=-1;side<=1;side++)
+            {
+                int resultlength = length + enemylength;
+                int resultside = side + enemyside;
+                int massnum = MassObj[resultlength,resultside].GetComponent<NumberMass>().GetNumber();
+                bool ret = false;
+               int resultnum = playerObj.GetComponent<MoveDataver2>().ResearchMass(massnum,ref ret);
+                if (ret)
+                {
+                   Vector3 vec = MoveMass(resultnum);
+                    return vec;
+                }
+            }
+        }
+        return Vector3.zero;
+    }
+
+
+    public bool OutArea(int length,int side)
+    {
+        if (length > MaxLength)
+        {
+            return false;
+        }
+        else if (side > MaxSide)
+        {
+            return false;
+        }
+
+        else if(length < 0)
+        {
+            return false;
+        }
+
+        else if(side < 0)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public Vector3 MoveMass(int targetmass)
+    {
+       for(int length =0;length<6;length++)
+        {
+            for(int side =0;side<6;side++)
+            {
+                int massnum = MassObj[length, side].GetComponent<NumberMass>().GetNumber();
+                if (massnum == targetmass)
+                return MassObj[length, side].transform.position;
+            }
+        }
+        return Vector3.zero;
+    }
+
     /// <summary>
     /// 引き分けの時の処理
     /// </summary>
@@ -465,6 +555,7 @@ public class BoardMaster : MonoBehaviour
     /// <param name="Playernum"></param>
     /// <param name="PlayerPos"></param>
     /// <returns></returns>
+    /// 
     public Vector3 EnemySurroundings(int Enemynum, int Playernum, GameObject PlayerPos)
     {
         Vector3 vec = Vector3.zero;
@@ -481,7 +572,6 @@ public class BoardMaster : MonoBehaviour
                 }
             }
         }
-
         for (int Movelength = -1; Movelength <= 1; Movelength++)//最初から隣接しているときの処理
         {
             for (int Moveside = -1; Moveside <= 1; Moveside++)
@@ -529,8 +619,6 @@ public class BoardMaster : MonoBehaviour
                 }
             }
         }
-
-
         return vec;
     }
 
@@ -569,7 +657,6 @@ public class BoardMaster : MonoBehaviour
     /// <param name="num"></param>
     public void SummonsFiledPos(int num)
     {
-        Debug.Log(num+"です");
         int MaxLMap = GetComponent<SummonsPosData>().GetMaxLength();
         int MaxSMap = GetComponent<SummonsPosData>().GetMaxSide();
         int instancecount = 0;
@@ -669,7 +756,16 @@ public class BoardMaster : MonoBehaviour
             }
         }
     }
-
+    public void SubtractionSummonSicknessCharacterListPop(GameObject popobj)
+    {
+        for (int count = 0; count < SummoningSicknessCharacterList.Count; count++)
+        {
+            if (SummoningSicknessCharacterList[count] == popobj)
+            {
+                SummoningSicknessCharacterList.RemoveAt(count);
+            }
+        }
+    }
     public void TurnStart()
     {
         TurnStartSkills();
@@ -725,7 +821,7 @@ public class BoardMaster : MonoBehaviour
     }
     void TurnEndSkills()
     {
-        for (int count = 0; count <= SumonCharacters.Count - 1; count++)
+        for (int count = 0; count < SumonCharacters.Count - 1; count++)
         {
             int PlayerNumber = SumonCharacters[count].GetComponent<CharacterStatus>().GetPlayerNumber();
             if (TurnPlayer == PlayerNumber)
@@ -738,6 +834,16 @@ public class BoardMaster : MonoBehaviour
             }
         }
 
+    }
+    public void TurnEndSkillPop(GameObject obj)
+    {
+        for(int count = 0;count < SumonCharacters.Count;count++)
+        {
+            if(SumonCharacters[count] == obj)
+            {
+                SumonCharacters.RemoveAt(count);
+            }
+        }
     }
     //聖女のスキルに使用
     public void SaintSkill(int posy, int posx, int damage)
@@ -825,9 +931,6 @@ public class BoardMaster : MonoBehaviour
                             IsMoveMassObj[length, side] = true;
                             Pos.z += 1;
                             GameObject InstanceKing = Instantiate(KingObj, Pos, Quaternion.identity);
-                            InstanceKing.GetComponent<MoveData>().ReadSetObj(InstanceKing);
-                            InstanceKing.GetComponent<ReadCsv>().SetTargetObj(InstanceKing);
-                            InstanceKing.GetComponent<MoveData>().IniSet();
                             CharObj[length, side] = InstanceKing;
                             MassStatus[length, side] = Status.IsMoveArea;
                             if (length == 0)
@@ -921,8 +1024,55 @@ public class BoardMaster : MonoBehaviour
     }
     public void PopYourCard(GameObject pop_obj)
     {
-        Debug.Log(TurnPlayer);
         PlayerObj[TurnPlayer].GetComponent<YourCard>().PopCard(pop_obj);
     }
 
+    public Vector3 GetMassPos(int length, int side)
+    {
+        return MassObj[length, side].transform.position;
+    }
+
+    public void SetNowPos(ref int nowlength,ref int nowside,int massnum)
+    {
+        for(int length =0; length < MaxLength; length++)
+        {
+            for(int  side=0; side < MaxSide; side++)
+            {
+                int num = MassObj[length, side].GetComponent<NumberMass>().GetNumber();
+                if (num == massnum)
+                {
+                  nowlength =  MassObj[length, side].GetComponent<NumberMass>().GetPosLength();
+                  nowside = MassObj[length, side].GetComponent<NumberMass>().GetPosSide();
+                    return;
+                }
+            }
+        }
+    }
+
+    public Vector3 GetMassPos(int massnum)
+    {
+        for(int length =0;length<6;length++)
+        {
+            for(int side =0;side<6;side++)
+            {
+                int num = MassObj[length, side].GetComponent<NumberMass>().GetNumber();
+                if(num == massnum)
+                {
+                    return MassObj[length, side].transform.position;
+                }
+            }
+        }
+        return Vector3.zero;
+    }
+
+    public void PopFunctions(GameObject popobj)
+    {
+        SubtractionSummonSicknessCharacterListPop(popobj);
+        TurnEndSkillPop(popobj);
+    }
+ 
+    public void GameOver()
+    {
+
+    }
 }

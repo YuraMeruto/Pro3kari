@@ -51,8 +51,8 @@ public class MouseState : MonoBehaviour
                     int retnum = AtachCharObject.GetComponent<CharacterStatus>().GetSummoningSickness();
                     if (retnum == 0)
                     {
-                        AtachCharObject.GetComponent<MoveData>().IsPossibleMove(AtachMassNumber);
-                        //    status =  PlayerStatus.Choose;
+
+                        AtachCharObject.GetComponent<MoveDataver2>().IsPossibleMove(AtachMassNumber);
                         GetComponent<Player>().SetState(Player.PlayerStatus.Choose);
                     }
                 }
@@ -78,19 +78,16 @@ public class MouseState : MonoBehaviour
             if (AtachcharCHarPlayerNumber == CopyAtachCharPlayerNumber)//ほかの自分のキャラクターだったらそのキャラクターにアタッチさせる
             {
                 IsSamePlayerCharObj = false;
-                //                status = PlayerStatus.None;
                 GetComponent<Player>().SetState(Player.PlayerStatus.None);
                 GetComponent<Player>().IsSkillZyazi();
                 AllIsMoveAreaDestroy();
                 AllKariDestroy();
                 AllSummonsCardDestroy();
-
             }
         }
         if (IsSamePlayerCharObj)
         {
 
-            //     GameObject IsEnemyObj = null;
             ret = MasterObject.GetComponent<BoardMaster>().GetIsMove(CopyAttachMassNumber);
             int AtachMassNumber = GetComponent<AtachMaster>().GetAttachMassNumber();
             IsEnemyObj = MasterObject.GetComponent<BoardMaster>().GetCharObject(CopyAttachMassNumber);//移動先が敵の駒があるのか確認
@@ -113,10 +110,11 @@ public class MouseState : MonoBehaviour
 
                         case BattleScene.BattleResult.Win://先に攻撃したキャラクターが勝った場合
                             IsEnemyObj.GetComponent<CharacterStatus>().skill.DestroyChar();
+                            MovePos = MasterObject.GetComponent<BoardMaster>().GetMassPos(CopyAttachMassNumber) ;
+                            MasterObject.GetComponent<BoardMaster>().PopFunctions(IsEnemyObj);
                             Destroy(IsEnemyObj);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
-
                             MovePos.z = 1.0f;
                             AtachCharObject.transform.position = MovePos;
                             MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
@@ -124,13 +122,19 @@ public class MouseState : MonoBehaviour
                             AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();
                             AtachCharObject = null;
                             ret = false;
-
                             //                        status = PlayerStatus.None;
                             GetComponent<Player>().SetState(Player.PlayerStatus.None);
                             break;
 
                         case BattleScene.BattleResult.Lose://先に攻撃したキャラクターが負けた場合
+                            int AtachRace = AtachCharObject.GetComponent<CharacterStatus>().GetRace();
+                            if(AtachRace == 6)//やられたのがキングの場合の処理
+                            {
+                                
+                            }
                             AtachCharObject.GetComponent<CharacterStatus>().skill.DestroyChar();
+
+                            MasterObject.GetComponent<BoardMaster>().PopFunctions(AtachCharObject);
                             Destroy(AtachCharObject);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
@@ -144,16 +148,15 @@ public class MouseState : MonoBehaviour
                             break;
 
                         case BattleScene.BattleResult.Draw://引き分けの場合
-                            MovePos = MasterObject.GetComponent<BoardMaster>().EnemySurroundings(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
+                            MovePos = MasterObject.GetComponent<BoardMaster>().EnemySuurrondings2(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                             AllIsMoveAreaDestroy();
                             AllSummonsCardDestroy();
-
                             MovePos.z = 1.0f;
                             AtachCharObject.transform.position = MovePos;
                             MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                             AtachCharObject.GetComponent<CharacterStatus>().skill.BattleEnd();
                             AtachCharObject = null;
-                            //                        status = PlayerStatus.None;
+
                             GetComponent<Player>().SetState(Player.PlayerStatus.None);
                             ret = false;
                             break;
@@ -169,6 +172,7 @@ public class MouseState : MonoBehaviour
             {
 
                 Debug.Log("通常移動");
+                AtachCharObject.GetComponent<MoveDataver2>().ListClear();
                 AtachCharObject.GetComponent<CharacterStatus>().skill.MoveStart();
                 MasterObject.GetComponent<BoardList>().SetMoveList(AtachCharObject);
                 AllIsMoveAreaDestroy();
@@ -182,7 +186,6 @@ public class MouseState : MonoBehaviour
                 {
                     AtachCharObject.GetComponent<CharacterStatus>().SetIsFirst();
                 }
-
                 MasterObject.GetComponent<BoardMaster>().SetIsCharObj(CopyAttachMassNumber, AtachMassNumber, AtachCharObject);
                 GetComponent<AtachMaster>().SetAttachMassObject(GetMass);
                 AtachCharObject.GetComponent<CharacterStatus>().skill.MoveEnd();//移動が終わったときのキャラクターのスキル
@@ -190,7 +193,7 @@ public class MouseState : MonoBehaviour
                 MasterObject.GetComponent<BoardMaster>().MoveCountSubtraction();
                 MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
                 GetComponent<Player>().SetState(Player.PlayerStatus.None);
-
+                DestroyMoveAreaObj();
             }
         }
 
@@ -281,8 +284,12 @@ public class MouseState : MonoBehaviour
                         InstanceSumonObj.GetComponent<CharacterStatus>().SetSummoningSickness(1);
                         MasterObject.GetComponent<BoardMaster>().SetSummoningSicknessCharacterList(InstanceSumonObj);
                     }
+
                     GetComponent<AtachMaster>().SetInstanceSumonObj(InstanceSumonObj);
                     MasterObject.GetComponent<BoardMaster>().SetAllFalseIsMove();
+                    int length = AtachMassObject.GetComponent<NumberMass>().GetPosLength();
+                    int side = AtachMassObject.GetComponent<NumberMass>().GetPosSide();
+                    InstanceSumonObj.GetComponent<MoveDataver2>().NowPosition(length,side);
                     SetIniSummonCard();
                     AllIsMoveAreaDestroy();
                     AllSummonsCardDestroy();
@@ -314,10 +321,15 @@ public class MouseState : MonoBehaviour
         int pnum;
         GameObject InstanceSumonObj = GetComponent<AtachMaster>().GetInstanceSumonObj();
         pnum = MasterObject.GetComponent<BoardMaster>().GetTurnPlayer();
+        if(pnum == 1)
+        {
+            InstanceSumonObj.GetComponent<SpriteRenderer>().color = new Color(1,0,0,1);
+        }
+        else
+        {
+            InstanceSumonObj.GetComponent<SpriteRenderer>().color = new Color(0, 0, 1, 1);
+        }
         InstanceSumonObj.GetComponent<CharacterStatus>().SetPlayerNumber(pnum);
-        InstanceSumonObj.GetComponent<MoveData>().ReadSetObj(InstanceSumonObj);
-        InstanceSumonObj.GetComponent<ReadCsv>().SetTargetObj(InstanceSumonObj);
-        InstanceSumonObj.GetComponent<MoveData>().IniSet();
         MasterObject.GetComponent<BoardMaster>().SetSummonCharacters(InstanceSumonObj);
         GetComponent<AtachMaster>().SetInstanceSumonObj(InstanceSumonObj);
     }
@@ -397,5 +409,15 @@ public class MouseState : MonoBehaviour
     public void SetSkillActiveGo(SkillActivateGo set)
     {
         skillgo = set;
+    }
+
+    void DestroyMoveAreaObj()
+    {
+        GameObject[] objects= GameObject.FindGameObjectsWithTag("IsMovetag");
+        foreach(var obj in objects)
+        {
+            Destroy(obj);
+        }
+
     }
 }
